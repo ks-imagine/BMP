@@ -1,56 +1,98 @@
-from flask import Flask, render_template, json, request
-from flaskext.mysql import MySQL
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, request, render_template, session
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
-mysql = MySQL()
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/qc_api"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-# MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'jay'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'jay'
-app.config['MYSQL_DATABASE_DB'] = 'BucketList'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
+
+class ProductsModel(db.Model):
+    __tablename__ = 'products'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String())
+    model = db.Column(db.String())
+    doors = db.Column(db.Integer())
+
+    def __init__(self, name, model, doors):
+        self.name = name
+        self.model = model
+        self.doors = doors
+
+    def __repr__(self):
+        return f"<Product {self.name}>"
 
 
 @app.route('/')
 def main():
-    return render_template('index.html')
+	return render_template('index.html')
 
-@app.route('/showSignUp')
-def showSignUp():
-    return render_template('signup.html')
+@app.route('/adminLogin', methods=['POST', 'GET'])
+def adminLogin():
+    if request.method == 'GET':
+        return render_template('admin-login.html')
+    elif request.method == 'POST':
+        return render_template('admin.html')
 
 
-@app.route('/signUp',methods=['POST','GET'])
-def signUp():
-    try:
-        _name = request.form['inputName']
-        _email = request.form['inputEmail']
-        _password = request.form['inputPassword']
+@app.route('/products', methods=['POST', 'GET'])
+def handle_products():
+    if request.method == 'POST':
+        if request.is_json:
+            data = request.get_json()
+            new_product = ProductsModel(name=data['name'], model=data['model'], doors=data['doors'])
 
-        # validate the received values
-        if _name and _email and _password:
-            # All Good, let's call MySQL
-            conn = mysql.connect()
-            cursor = conn.cursor()
-            _hashed_password = generate_password_hash(_password)
-            cursor.callproc('sp_createUser',(_name,_email,_hashed_password))
-            data = cursor.fetchall()
+            db.session.add(new_product)
+            db.session.commit()
 
-            if len(data) == 0:
-                conn.commit()
-                return json.dumps({'message':'User created successfully !'})
-            else:
-                return json.dumps({'error':str(data[0])})
+            return {"message": f"Product {new_product.name} has been created successfully."}
         else:
-            return json.dumps({'html':'<span>Enter the required fields</span>'})
+            return {"error": "The request payload is not in JSON format"}
 
-    except Exception as e:
-        return json.dumps({'error':str(e)})
-    finally:
-        cursor.close()
-        conn.close()
+    elif request.method == 'GET':
+        products = ProductsModel.query.all()
+        results = [
+            {
+                "name": product.name,
+                "model": product.model,
+                "doors": product.doors
+            } for product in products]
 
-if __name__ == "__main__":
+        return {"count": len(results), "products": results, "message": "success"}
+
+
+@app.route('/products/<product_id>', methods=['GET', 'PUT', 'DELETE'])
+def handle_product(product_id):
+    product = ProductsModel.query.get_or_404(product_id)
+
+    if request.method == 'GET':
+        response = {
+            "name": product.name,
+            "model": product.model,
+            "doors": product.doors
+        }
+        return {"message": "success", "product": response}
+
+    elif request.method == 'PUT':
+        data = request.get_json()
+        product.name = data['name']
+        product.model = data['model']
+        product.doors = data['doors']
+
+        db.session.add(product)
+        db.session.commit()
+
+        return {"message": f"product {product.name} successfully updated"}
+
+    elif request.method == 'DELETE':
+        db.session.delete(product)
+        db.session.commit()
+
+        return {"message": f"Product {product.name} successfully deleted."}
+
+
+if __name__ == '__main__':
     app.run(debug=True)
