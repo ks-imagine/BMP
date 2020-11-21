@@ -88,12 +88,7 @@ def handle_product(product_id):
     elif request.method == 'PUT':
         data = request.get_json()
         exists = False
-        if (product.model == data['model']):
-            product.name = data['name']
-            product.model = data['model']
-            product.client = data['client']
-            product.weight = data['weight']
-        else:
+        if (product.model != data['model']):
             exists = False
             products = ProductsModel.query.all()
             for product in products:
@@ -104,6 +99,10 @@ def handle_product(product_id):
             exists = False
             return {"message": f"product {product.name} not updated. model: {product.model} already exists."}
         else:
+            product.name = data['name']
+            product.model = data['model']
+            product.client = data['client']
+            product.weight = data['weight']
             db.session.add(product)
             db.session.commit()
             return {"message": f"product {product.name} successfully updated"}
