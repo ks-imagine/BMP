@@ -1,4 +1,4 @@
-# BMP | Quality Control Web App
+# BMP | Quality Control API
 
 BMP QC API repository. uWu
 
