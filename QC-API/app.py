@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -39,7 +39,6 @@ def check_product_exists(_product):
 
 @app.route('/')
 def main():
-    # return render_template('index.html', text="hello world")
 	return {"hello": "world"}
 
 
