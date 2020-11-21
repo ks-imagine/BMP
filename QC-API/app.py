@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -15,32 +15,17 @@ class ProductsModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
     model = db.Column(db.String(), unique=True)
+    client = db.Column(db.String())
     weight = db.Column(db.Integer())
 
-    def __init__(self, name, model, weight):
+    def __init__(self, name, model, client, weight):
         self.name = name
         self.model = model
+        self.client = client
         self.weight = weight
 
     def __repr__(self):
         return f"<Product {self.name}>"
-
-
-class UsersModel(db.Model):
-    __tablename__ = 'users'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String())
-    email = db.Column(db.String(), unique=True)
-    employeeid = db.Column(db.Integer())
-
-    def __init__(self, name, model, weight):
-        self.name = name
-        self.email = email
-        self.employeeid = employeeid
-
-    def __repr__(self):
-        return f"<User {self.name}>"
 
 
 def check_product_exists(_product):
@@ -54,6 +39,7 @@ def check_product_exists(_product):
 
 @app.route('/')
 def main():
+    # return render_template('index.html', text="hello world")
 	return {"hello": "world"}
 
 
@@ -62,7 +48,7 @@ def handle_products():
     if request.method == 'POST':
         if request.is_json:
             data = request.get_json()
-            new_product = ProductsModel(name=data['name'], model=data['model'], weight=data['weight'])
+            new_product = ProductsModel(name=data['name'], model=data['model'], client=data['client'], weight=data['weight'])
 
             if not check_product_exists(new_product):
                 db.session.add(new_product)
@@ -79,6 +65,7 @@ def handle_products():
             {
                 "name": product.name,
                 "model": product.model,
+                "client": product.client,
                 "weight": product.weight
             } for product in products]
 
@@ -93,20 +80,33 @@ def handle_product(product_id):
         response = {
             "name": product.name,
             "model": product.model,
+            "client": product.client,
             "weight": product.weight
         }
         return {"message": "success", "product": response}
 
     elif request.method == 'PUT':
         data = request.get_json()
-        product.name = data['name']
-        product.model = data['model']
-        product.weight = data['weight']
+        exists = False
+        if (product.model == data['model']):
+            product.name = data['name']
+            product.model = data['model']
+            product.client = data['client']
+            product.weight = data['weight']
+        else:
+            exists = False
+            products = ProductsModel.query.all()
+            for product in products:
+                if (product.model == data['model']):
+                    exists = True
 
-        db.session.add(product)
-        db.session.commit()
-
-        return {"message": f"product {product.name} successfully updated"}
+        if exists:
+            exists = False
+            return {"message": f"product {product.name} not updated. model: {product.model} already exists."}
+        else:
+            db.session.add(product)
+            db.session.commit()
+            return {"message": f"product {product.name} successfully updated"}
 
     elif request.method == 'DELETE':
         db.session.delete(product)
