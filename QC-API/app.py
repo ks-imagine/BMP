@@ -28,14 +28,7 @@ class ProductsModel(db.Model):
 
 @app.route('/')
 def main():
-	return render_template('index.html')
-
-@app.route('/adminLogin', methods=['POST', 'GET'])
-def adminLogin():
-    if request.method == 'GET':
-        return render_template('admin-login.html')
-    elif request.method == 'POST':
-        return render_template('admin.html')
+	return {"hello": "world"}
 
 
 @app.route('/products', methods=['POST', 'GET'])
