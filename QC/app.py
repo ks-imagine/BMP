@@ -1,8 +1,9 @@
 from flask_login import LoginManager, UserMixin, login_required, current_user, login_user, logout_user
-from flask import Flask, render_template, Blueprint, redirect, url_for, request, flash
+from flask import Flask, render_template, Blueprint, redirect, url_for, request, flash, json
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+import sys
 
 
 app = Flask(__name__)
@@ -93,7 +94,7 @@ def login_post():
 
     # if the above check passes, then we know the user has the right credentials
     login_user(user, remember=remember)
-    return redirect(url_for('profile'))
+    return redirect(url_for('index'))
 
 @app.route('/signup')
 # @login_required
@@ -101,6 +102,7 @@ def signup():
     return render_template('signup.html')
 
 @app.route('/signup', methods=['POST'])
+@login_required
 def signup_post():
 
     email = request.form.get('email')
@@ -140,14 +142,7 @@ def load_user(user_id):
 
 
 
-
-
-
-
-
-
-
-# API
+#### Application
 @app.route('/products', methods=['POST', 'GET'])
 @login_required
 def handle_products():
@@ -175,7 +170,7 @@ def handle_products():
                 "weight": product.weight
             } for product in products]
 
-        return {"count": len(results), "products": results, "message": "success"}
+        return render_template('products.html', name=current_user.name, results=results)
 
 
 @app.route('/products/<product_id>', methods=['GET', 'PUT', 'DELETE'])
@@ -221,6 +216,19 @@ def handle_product(product_id):
         return {"message": f"Product {product.name} successfully deleted."}
 
 
+### API
+@app.route('/api/products', methods=['GET'])
+def handle_products_api():
+    if request.method == 'GET':
+        products = ProductsModel.query.all()
+        results = [
+            {
+                "name": product.name,
+                "model": product.model,
+                "client": product.client,
+                "weight": product.weight
+            } for product in products]
+        return {"count": len(results), "products": results, "message": "success"}
 
 
 
