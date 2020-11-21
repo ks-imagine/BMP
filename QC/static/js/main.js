@@ -75,6 +75,6 @@ function searchTable() {
         } else {
           tr[i].style.display = "none";
         }
-      }       
+      }
     }
   }

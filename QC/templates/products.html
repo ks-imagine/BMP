@@ -26,7 +26,7 @@
                     <td>{{ product.model }}</td>
                     <td>{{ product.client }}</td>
                     <td>{{ product.weight }}</td>
-                    <td id="reqs">{{ product.requirements}}</td>
+                    <td>{{ product.requirements}}</td>
                 </tr>
             </tbody>
             {% endfor %}
@@ -34,9 +34,4 @@
         <h4>{{ no_products }}</h4>
     </div>
 </h3>
-<script>
-    var txt = document.getElementById("reqs").innerText;
-    var obj = JSON.parse(txt);
-    document.getElementById("demo").innerHTML = obj.length + ", " + obj.width;
-</script>
 {% endblock %}
