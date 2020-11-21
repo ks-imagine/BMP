@@ -1,6 +1,6 @@
 # BMP | Quality Control Web App
 
-This repository is the property of BMP.
+BMP QC API repository. uWu
 
 
 ## Getting Started
