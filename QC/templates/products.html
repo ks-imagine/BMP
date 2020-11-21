@@ -16,6 +16,7 @@
                     <th onclick="sortTable(1)"> Model </th>
                     <th onclick="sortTable(2)"> Client </th>
                     <th onclick="sortTable(3)"> Weight </th>
+                    <th onclick="sortTable(4)"> Requirements </th>
                 </tr>
             </thead>
             {% for product in results %}
@@ -25,10 +26,17 @@
                     <td>{{ product.model }}</td>
                     <td>{{ product.client }}</td>
                     <td>{{ product.weight }}</td>
+                    <td id="reqs">{{ product.requirements}}</td>
                 </tr>
             </tbody>
             {% endfor %}
         </table>
+        <h4>{{ no_products }}</h4>
     </div>
 </h3>
+<script>
+    var txt = document.getElementById("reqs").innerText;
+    var obj = JSON.parse(txt);
+    document.getElementById("demo").innerHTML = obj.length + ", " + obj.width;
+</script>
 {% endblock %}

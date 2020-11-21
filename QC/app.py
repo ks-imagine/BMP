@@ -39,12 +39,14 @@ class ProductsModel(db.Model):
     model = db.Column(db.String(), unique=True)
     client = db.Column(db.String())
     weight = db.Column(db.Integer())
+    requirements = db.Column(db.JSON())
 
-    def __init__(self, name, model, client, weight):
+    def __init__(self, name, model, client, weight, requirements):
         self.name = name
         self.model = model
         self.client = client
         self.weight = weight
+        self.requirements = requirements
 
     def __repr__(self):
         return f"<Product {self.name}>"
@@ -59,9 +61,7 @@ def check_product_exists(_product):
     return exists
 
 
-
-
-# main.py
+# Home Page + Profile Page
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -73,7 +73,7 @@ def profile():
 
 
 
-# auth.py
+# Login System
 @app.route('/login')
 def login():
     return render_template('login.html')
@@ -102,7 +102,7 @@ def signup():
     return render_template('signup.html')
 
 @app.route('/signup', methods=['POST'])
-@login_required
+# @login_required
 def signup_post():
 
     email = request.form.get('email')
@@ -149,7 +149,7 @@ def handle_products():
     if request.method == 'POST':
         if request.is_json:
             data = request.get_json()
-            new_product = ProductsModel(name=data['name'], model=data['model'], client=data['client'], weight=data['weight'])
+            new_product = ProductsModel(name=data['name'], model=data['model'], client=data['client'], weight=data['weight'], requirements=data['requirements'])
 
             if not check_product_exists(new_product):
                 db.session.add(new_product)
@@ -167,14 +167,16 @@ def handle_products():
                 "name": product.name,
                 "model": product.model,
                 "client": product.client,
-                "weight": product.weight
+                "weight": product.weight,
+                "requirements": product.requirements
             } for product in products]
-
-        return render_template('products.html', name=current_user.name, results=results)
+        if len(results) == 0:
+            return render_template('products.html', name=current_user.name, no_products="No Products to Display")
+        else:
+            return render_template('products.html', name=current_user.name, results=results)
 
 
 @app.route('/products/<product_id>', methods=['GET', 'PUT', 'DELETE'])
-@login_required
 def handle_product(product_id):
     product = ProductsModel.query.get_or_404(product_id)
 
@@ -183,7 +185,8 @@ def handle_product(product_id):
             "name": product.name,
             "model": product.model,
             "client": product.client,
-            "weight": product.weight
+            "weight": product.weight,
+            "requirements": product.requirements
         }
         return {"message": "success", "product": response}
 
@@ -205,6 +208,7 @@ def handle_product(product_id):
             product.model = data['model']
             product.client = data['client']
             product.weight = data['weight']
+            product.requirements = data ['requirements']
             db.session.add(product)
             db.session.commit()
             return {"message": f"product {product.name} successfully updated"}
@@ -217,7 +221,7 @@ def handle_product(product_id):
 
 
 ### API
-@app.route('/api/products', methods=['GET'])
+@app.route('/api/products', methods=['GET', 'POST'])
 def handle_products_api():
     if request.method == 'GET':
         products = ProductsModel.query.all()
@@ -229,6 +233,19 @@ def handle_products_api():
                 "weight": product.weight
             } for product in products]
         return {"count": len(results), "products": results, "message": "success"}
+    elif request.method == 'POST':
+        if request.is_json:
+            data = request.get_json()
+            new_product = ProductsModel(name=data['name'], model=data['model'], client=data['client'], weight=data['weight'], requirements=data['requirements'])
+
+            if not check_product_exists(new_product):
+                db.session.add(new_product)
+                db.session.commit()
+                return {"message": f"Product {new_product.name} has been created successfully."}
+            else:
+                return {"message": f"Product '{new_product.name}' already exists."}
+        else:
+            return {"error": "The request payload is not in JSON format"}
 
 
 
