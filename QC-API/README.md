@@ -30,7 +30,7 @@ Kindly ensure you have the following installed:
     $ pip install -r requirements.txt
     ```
 
-3. Create a PostgreSQL user with the username and password `postgres` and create a database called `qc_api`:
+3. Create a PostgreSQL user with the username and password `postgres` and create a database called `bmp-qc-api`:
 
     ```
     $ createuser --interactive --pwprompt
@@ -46,6 +46,7 @@ Kindly ensure you have the following installed:
 5. Execute the migrations to create the `products` table:
 
     ```
+    $ flask db init
     $ flask db migrate
     $ flask db upgrade
     ```
