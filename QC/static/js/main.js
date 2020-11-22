@@ -8,7 +8,7 @@ function sortTable(n) {
     shouldSwitch,
     dir,
     switchcount = 0;
-  table = document.getElementById("myTable");
+  table = document.getElementById("productTable");
   switching = true;
   //Set the sorting direction to ascending:
   dir = "asc";
@@ -62,9 +62,9 @@ function sortTable(n) {
 
 function searchTable() {
     var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("myInput");
+    input = document.getElementById("productSearch");
     filter = input.value.toUpperCase();
-    table = document.getElementById("myTable");
+    table = document.getElementById("productTable");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
       td = tr[i].getElementsByTagName("td")[0];

@@ -7,26 +7,26 @@
     All Products
 </h1>
 <h3>
-    <div class="center content">
-        <input type="text" id="myInput" onkeyup="searchTable()" placeholder="Search..." title="Type in a name">
-        <table id="myTable">
+    <div class="center content" style="max-width: 75%;">
+        <input type="text" id="productSearch" onkeyup="searchTable()" placeholder="Search..." title="Type in a name">
+        <table id="productTable">
             <thead>
                 <tr>
-                    <th onclick="sortTable(0)"> Name </th>
-                    <th onclick="sortTable(1)"> Model </th>
-                    <th onclick="sortTable(2)"> Client </th>
-                    <th onclick="sortTable(3)"> Weight </th>
+                    <th onclick="sortTable(0)"> BMP ID# </th>
+                    <th onclick="sortTable(1)"> Product Description </th>
+                    <th onclick="sortTable(2)"> Customer </th>
+                    <th onclick="sortTable(3)"> Last QC Record </th>
                     <th onclick="sortTable(4)"> Requirements </th>
                 </tr>
             </thead>
             {% for product in results %}
             <tbody>
                 <tr>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.model }}</td>
-                    <td>{{ product.client }}</td>
-                    <td>{{ product.weight }}</td>
-                    <td>{{ product.requirements}}</td>
+                    <td>{{ product.bmpid }}</td>
+                    <td>{{ product.desc }}</td>
+                    <td>{{ product.customer }}</td>
+                    <td>{{ product.lastqc }}</td>
+                    <td class="reqs">{{ product.requirements}}</td>
                 </tr>
             </tbody>
             {% endfor %}
@@ -34,4 +34,28 @@
         <h4>{{ no_products }}</h4>
     </div>
 </h3>
+<script>
+    var x = document.getElementsByClassName("reqs").length;
+    for (var i = 0; i < x; i++) {
+        var info = document.getElementsByClassName("reqs")[i].innerText.replace(/'/g, '"');
+        var obj = JSON.parse(info);
+        console.log(obj);
+        document.getElementsByClassName("reqs")[i].innerHTML = ("");
+        var first = true;
+        for (var key in obj) {
+            if (!first) {
+                document.getElementsByClassName("reqs")[i].innerHTML += ("<br>");
+            } first = false;
+            var value = obj[key];
+            console.log(key + ", " + value);
+            document.getElementsByClassName("reqs")[i].innerHTML += (key + ", " + value);
+        }
+    }
+</script>
 {% endblock %}
+
+self.bmpid = bmpid
+self.desc = desc
+self.customer = customer
+self.lastqc = lastqc
+self.requirements = requirements

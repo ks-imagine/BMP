@@ -2563,6 +2563,7 @@ a.box:active {
   color: #ffffff;
   text-align: left;
   cursor: pointer;
+  vertical-align: middle;
 }
 .content table thead td,
 .content table thead th {
@@ -9231,7 +9232,7 @@ label.panel-block:hover {
   padding: 10px;
 }
 
-#myInput {
+#productSearch {
   background-image: url('searchicon.png');
   background-position: 10px 12px;
   background-repeat: no-repeat;

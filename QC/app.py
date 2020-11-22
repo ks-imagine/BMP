@@ -14,6 +14,24 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
+'''
+ ___________
+< DB Models >
+ -----------
+   \
+    \
+     \
+        __ \ / __
+       /  \ | /  \
+           \|/
+       _.---v---.,_
+      /            \  /\__/\
+     /              \ \_  _/
+     |__ @           |_/ /
+      _/                /
+      \       \__,     /
+   ~~~~\~~~~~~~~~~~~~~`~~~
+'''
 class UserModel(UserMixin, db.Model):
     __tablename__ = 'users'
 
@@ -28,52 +46,48 @@ class UserModel(UserMixin, db.Model):
         self.name = name
 
     def __repr__(self):
-        return f"<Product {self.name}>"
+        return f"<Name {self.name}>"
 
 
 class ProductsModel(db.Model):
     __tablename__ = 'products'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String())
-    model = db.Column(db.String(), unique=True)
-    client = db.Column(db.String())
-    weight = db.Column(db.Integer())
+    bmpid = db.Column(db.Integer(), unique=True)
+    desc = db.Column(db.String())
+    customer = db.Column(db.String())
+    lastqc = db.Column(db.DateTime())
     requirements = db.Column(db.JSON())
 
-    def __init__(self, name, model, client, weight, requirements):
-        self.name = name
-        self.model = model
-        self.client = client
-        self.weight = weight
+    def __init__(self, bmpid, desc, customer, lastqc, requirements):
+        self.bmpid = bmpid
+        self.desc = desc
+        self.customer = customer
+        self.lastqc = lastqc
         self.requirements = requirements
 
     def __repr__(self):
-        return f"<Product {self.name}>"
+        return f"<Product {self.bmpid}>"
 
 
-def check_product_exists(_product):
-    exists = False
-    products = ProductsModel.query.all()
-    for product in products:
-        if (product.model == _product.model):
-            exists = True
-    return exists
-
-
-# Home Page + Profile Page
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/profile')
-@login_required
-def profile():
-    return render_template('profile.html', name=current_user.name)
-
-
-
-# Login System
+'''
+ ______________
+< Login System >
+ --------------
+   \
+    \
+     \
+        __ \ / __
+       /  \ | /  \
+           \|/
+       _.---v---.,_
+      /            \  /\__/\
+     /              \ \_  _/
+     |__ @           |_/ /
+      _/                /
+      \       \__,     /
+   ~~~~\~~~~~~~~~~~~~~`~~~
+'''
 @app.route('/login')
 def login():
     return render_template('login.html')
@@ -141,39 +155,65 @@ def load_user(user_id):
     return UserModel.query.get(int(user_id))
 
 
+'''
+ _________________
+< Web Application >
+ -----------------
+   \
+    \
+     \
+        __ \ / __
+       /  \ | /  \
+           \|/
+       _.---v---.,_
+      /            \  /\__/\
+     /              \ \_  _/
+     |__ @           |_/ /
+      _/                /
+      \       \__,     /
+   ~~~~\~~~~~~~~~~~~~~`~~~
+'''
+# Home Page + Profile Page
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-#### Application
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', name=current_user.name)
+
 @app.route('/products', methods=['POST', 'GET'])
 @login_required
 def handle_products():
     if request.method == 'POST':
         if request.is_json:
             data = request.get_json()
-            new_product = ProductsModel(name=data['name'], model=data['model'], client=data['client'], weight=data['weight'], requirements=data['requirements'])
+            new_product = ProductsModel(bmpid=data['bmpid'], desc=data['desc'], customer=data['customer'], lastqc=data['lastqc'], requirements=data['requirements'])
 
             if not check_product_exists(new_product):
                 db.session.add(new_product)
                 db.session.commit()
-                return {"message": f"Product {new_product.name} has been created successfully."}
+                return {"Success": f"Product: '{new_product.desc} | {new_product.bmpid}' has been created."}
             else:
-                return {"message": f"Product '{new_product.name}' already exists."}
+                return {"Fail": f"BMP Product ID: '{new_product.bmpid}' already exists."}
         else:
-            return {"error": "The request payload is not in JSON format"}
+            return {"Error": "The request payload is not in JSON format"}
 
     elif request.method == 'GET':
         products = ProductsModel.query.all()
         results = [
             {
-                "name": product.name,
-                "model": product.model,
-                "client": product.client,
-                "weight": product.weight,
+                "bmpid": product.bmpid,
+                "desc": product.desc,
+                "customer": product.customer,
+                "lastqc": product.lastqc,
                 "requirements": product.requirements
             } for product in products]
         if len(results) == 0:
-            return render_template('products.html', name=current_user.name, no_products="No Products to Display")
+            return render_template('products.html', no_products="No Products to Display")
         else:
-            return render_template('products.html', name=current_user.name, results=results)
+            return render_template('products.html', results=results)
 
 
 @app.route('/products/<product_id>', methods=['GET', 'PUT', 'DELETE'])
@@ -182,10 +222,10 @@ def handle_product(product_id):
 
     if request.method == 'GET':
         response = {
-            "name": product.name,
-            "model": product.model,
-            "client": product.client,
-            "weight": product.weight,
+            "bmpid": product.bmpid,
+            "desc": product.desc,
+            "customer": product.customer,
+            "lastqc": product.lastqc,
             "requirements": product.requirements
         }
         return {"message": "success", "product": response}
@@ -193,60 +233,109 @@ def handle_product(product_id):
     elif request.method == 'PUT':
         data = request.get_json()
         exists = False
-        if (product.model != data['model']):
+        if (product.bmpid != data['bmpid']):
             exists = False
             products = ProductsModel.query.all()
             for product in products:
-                if (product.model == data['model']):
+                if (product.bmpid == data['bmpid']):
                     exists = True
 
         if exists:
             exists = False
-            return {"message": f"product {product.name} not updated. model: {product.model} already exists."}
+            return {"Fail": f"Product not updated. BMP Product ID '{product.bmpid}' already exists."}
         else:
-            product.name = data['name']
-            product.model = data['model']
-            product.client = data['client']
-            product.weight = data['weight']
+            product.bmpid = data['bmpid']
+            product.desc = data['desc']
+            product.customer = data['customer']
+            product.lastqc = data['lastqc']
             product.requirements = data ['requirements']
             db.session.add(product)
             db.session.commit()
-            return {"message": f"product {product.name} successfully updated"}
+            return {"Success": f"Product: '{product.desc} | {product.bmpid}' has been updated."}
 
     elif request.method == 'DELETE':
         db.session.delete(product)
         db.session.commit()
 
-        return {"message": f"Product {product.name} successfully deleted."}
+        return {"Success": f"Product: '{product.desc} | {product.bmpid}' has been deleted."}
 
 
-### API
+'''
+ _____
+< API >
+ -----
+   \
+    \
+     \
+        __ \ / __
+       /  \ | /  \
+           \|/
+       _.---v---.,_
+      /            \  /\__/\
+     /              \ \_  _/
+     |__ @           |_/ /
+      _/                /
+      \       \__,     /
+   ~~~~\~~~~~~~~~~~~~~`~~~
+'''
+@app.route('/api')
+def api_home():
+    return {"Hello" : "World"}
+
+
 @app.route('/api/products', methods=['GET', 'POST'])
 def handle_products_api():
     if request.method == 'GET':
         products = ProductsModel.query.all()
         results = [
             {
-                "name": product.name,
-                "model": product.model,
-                "client": product.client,
-                "weight": product.weight
+                "bmpid": product.bmpid,
+                "desc": product.desc,
+                "customer": product.customer,
+                "lastqc": product.lastqc,
+                "requirements": product.requirements
             } for product in products]
         return {"count": len(results), "products": results, "message": "success"}
     elif request.method == 'POST':
         if request.is_json:
             data = request.get_json()
-            new_product = ProductsModel(name=data['name'], model=data['model'], client=data['client'], weight=data['weight'], requirements=data['requirements'])
-
+            new_product = ProductsModel(bmpid=data['bmpid'], desc=data['desc'], customer=data['customer'], lastqc=data['lastqc'], requirements=data['requirements'])
             if not check_product_exists(new_product):
                 db.session.add(new_product)
                 db.session.commit()
-                return {"message": f"Product {new_product.name} has been created successfully."}
+                return {"Success": f"Product: '{new_product.desc} | {new_product.bmpid}' has been created."}
             else:
-                return {"message": f"Product '{new_product.name}' already exists."}
+                return {"Fail": f"BMP Product ID: '{new_product.bmpid}' already exists."}
         else:
-            return {"error": "The request payload is not in JSON format"}
+            return {"Error": "The request payload is not in JSON format"}
 
+
+
+'''
+ __________________
+< Random Functions >
+ ------------------
+   \
+    \
+     \
+        __ \ / __
+       /  \ | /  \
+           \|/
+       _.---v---.,_
+      /            \  /\__/\
+     /              \ \_  _/
+     |__ @           |_/ /
+      _/                /
+      \       \__,     /
+   ~~~~\~~~~~~~~~~~~~~`~~~
+'''
+def check_product_exists(_product):
+    exists = False
+    products = ProductsModel.query.all()
+    for product in products:
+        if (product.bmpid == _product.bmpid):
+            exists = True
+    return exists
 
 
 if __name__ == '__main__':
