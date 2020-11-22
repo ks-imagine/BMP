@@ -287,8 +287,10 @@ def handle_product(product_id):
             db.session.delete(product)
             db.session.commit()
             flash("Product successfully deleted.")
+            return {"Success": "Product has been deleted."}
         else:
             flash("Product unable to be deleted since it has QC records tied to it.")
+            return {"Success": "Product not deleted."}
 
 
 '''
