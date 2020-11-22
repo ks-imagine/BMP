@@ -1,7 +1,5 @@
 __pycache__/
 migrations/
-QC/migrations
-QC/migrations/
 
 #MAC OS
 .DS_Store
