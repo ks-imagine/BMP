@@ -5834,9 +5834,11 @@ a.list-item {
 }
 .navbar > .container {
   align-items: stretch;
-  display: flex;
+  /* display: flex; */
   min-height: 3.25rem;
   width: 100%;
+  padding-right: 15px;
+  text-align: right;
 }
 .navbar.has-shadow {
   box-shadow: 0 2px 0 0 #f5f5f5;
@@ -5929,12 +5931,12 @@ html.has-navbar-fixed-bottom {
   transform: translateY(-5px) rotate(-45deg);
 }
 .navbar-menu {
-  display: none;
+  /* display: none; */
 }
 .navbar-item,
 .navbar-link {
   color: #4a4a4a;
-  display: block;
+  /* display: block; */
   line-height: 1.5;
   padding: 0.5rem 0.75rem;
   position: relative;
@@ -5956,7 +5958,7 @@ a.navbar-item:hover {
   color: #3273dc;
 }
 .navbar-item {
-  display: block;
+  /* display: block; */
   flex-grow: 0;
   flex-shrink: 0;
 }
@@ -6017,7 +6019,7 @@ a.navbar-item:hover {
 }
 @media screen and (max-width: 1087px) {
   .navbar > .container {
-    display: block;
+    /* display: block; */
   }
   .navbar-brand .navbar-item,
   .navbar-tabs .navbar-item {
@@ -8656,8 +8658,15 @@ label.panel-block:hover {
   }
 }
 .hero.is-primary {
-  background-image: linear-gradient( to bottom,#141e30 0%, #243b55 100% );
+  background-color: #141e30;
+  background-image: url('../background.jpg');
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
   color: #fff;
+  /* background-image: linear-gradient( to bottom,#141e30 0%, #243b55 100% ); */
 }
 .hero.is-primary a:not(.button):not(.dropdown-item):not(.tag),
 .hero.is-primary strong {
@@ -8675,7 +8684,7 @@ label.panel-block:hover {
 }
 @media screen and (max-width: 1087px) {
   .hero.is-primary .navbar-menu {
-    background-color: #209cee;
+    background-color: rgba(0, 0, 0, 0);
   }
 }
 .hero.is-primary .navbar-item,
