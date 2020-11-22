@@ -78,3 +78,35 @@ function searchTable() {
       }
     }
   }
+
+function deleteProduct(productID, bmpID, desc){
+  $.ajax({
+      url: 'products/' + productID,
+      type: "DELETE",
+      success : function(msg) {
+        window.location.href = '/products';
+      },
+      error: function(jqXHR, textStatus) {
+          alert('Error Occured'); //MESSAGE
+          window.location.href = '/products';
+      }
+  });
+}
+
+function toggleForm() {
+  var x = document.getElementById("addProduct");
+  if (x.style.display === "none") {
+      x.style.display = "block";
+  } else {
+      x.style.display = "none";
+  }
+}
+
+function toggleForm() {
+  var x = document.getElementById("addProduct");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+      x.style.display = "none";
+  }
+}

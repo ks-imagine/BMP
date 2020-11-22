@@ -1,9 +1,10 @@
 from flask_login import LoginManager, UserMixin, login_required, current_user, login_user, logout_user
-from flask import Flask, render_template, Blueprint, redirect, url_for, request, flash, json
+from flask import Flask, render_template, Blueprint, redirect, url_for, request, flash, json, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 import sys
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -187,23 +188,48 @@ def profile():
 @login_required
 def handle_products():
     if request.method == 'POST':
-        if request.is_json:
-            data = request.get_json()
-            new_product = ProductsModel(bmpid=data['bmpid'], desc=data['desc'], customer=data['customer'], lastqc=data['lastqc'], requirements=data['requirements'])
+        bmpid = int(request.form.get("bmpid"))
+        desc = request.form.get("desc")
+        customer = request.form.get("customer")
+        lastqc = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        requirements = request.form.get("requirements")
+        if not requirements:
+            requirements = "{\"None\" : \"N/A\"}"
+        requirements = json.loads(requirements)
 
-            if not check_product_exists(new_product):
-                db.session.add(new_product)
-                db.session.commit()
-                return {"Success": f"Product: '{new_product.desc} | {new_product.bmpid}' has been created."}
-            else:
-                return {"Fail": f"BMP Product ID: '{new_product.bmpid}' already exists."}
+        new_product = ProductsModel(bmpid, desc, customer, lastqc, requirements)
+        if not check_product_exists(new_product):
+            db.session.add(new_product)
+            db.session.commit()
+            products = ProductsModel.query.all()
+            results = [
+                {
+                    "id" : product.id,
+                    "bmpid": product.bmpid,
+                    "desc": product.desc,
+                    "customer": product.customer,
+                    "lastqc": product.lastqc,
+                    "requirements": product.requirements
+                } for product in products]
+            return render_template('products.html', results=results, status_good=f"Success! Product: '{new_product.desc} | {new_product.bmpid}' has been created.")
         else:
-            return {"Error": "The request payload is not in JSON format"}
+            products = ProductsModel.query.all()
+            results = [
+                {
+                    "id" : product.id,
+                    "bmpid": product.bmpid,
+                    "desc": product.desc,
+                    "customer": product.customer,
+                    "lastqc": product.lastqc,
+                    "requirements": product.requirements
+                } for product in products]
+            return render_template('products.html', results=results, status_bad=f"Fail...  BMP Product ID: '{new_product.bmpid}' already exists.")
 
     elif request.method == 'GET':
         products = ProductsModel.query.all()
         results = [
             {
+                "id" : product.id,
                 "bmpid": product.bmpid,
                 "desc": product.desc,
                 "customer": product.customer,
@@ -216,12 +242,14 @@ def handle_products():
             return render_template('products.html', results=results)
 
 
-@app.route('/products/<product_id>', methods=['GET', 'PUT', 'DELETE'])
+
+@app.route('/products/<product_id>', methods=['GET', 'POST', 'DELETE'])
 def handle_product(product_id):
     product = ProductsModel.query.get_or_404(product_id)
 
     if request.method == 'GET':
         response = {
+            "id" : product.id,
             "bmpid": product.bmpid,
             "desc": product.desc,
             "customer": product.customer,
@@ -230,7 +258,7 @@ def handle_product(product_id):
         }
         return {"message": "success", "product": response}
 
-    elif request.method == 'PUT':
+    elif request.method == 'POST':
         data = request.get_json()
         exists = False
         if (product.bmpid != data['bmpid']):
@@ -254,10 +282,13 @@ def handle_product(product_id):
             return {"Success": f"Product: '{product.desc} | {product.bmpid}' has been updated."}
 
     elif request.method == 'DELETE':
-        db.session.delete(product)
-        db.session.commit()
-
-        return {"Success": f"Product: '{product.desc} | {product.bmpid}' has been deleted."}
+        qcRecords = ProductsModel.query.filter_by(id=product_id).first() #change this once qc table built
+        if (qcRecords): #change this to not qcRecords once QC table is built
+            db.session.delete(product)
+            db.session.commit()
+            flash("Product successfully deleted.")
+        else:
+            flash("Product unable to be deleted since it has QC records tied to it.")
 
 
 '''
@@ -289,6 +320,7 @@ def handle_products_api():
         products = ProductsModel.query.all()
         results = [
             {
+                "id" : product.id,
                 "bmpid": product.bmpid,
                 "desc": product.desc,
                 "customer": product.customer,
@@ -307,8 +339,55 @@ def handle_products_api():
             else:
                 return {"Fail": f"BMP Product ID: '{new_product.bmpid}' already exists."}
         else:
-            return {"Error": "The request payload is not in JSON format"}
+            return {"API Error": "The request payload is not in JSON format"}
 
+
+@app.route('/api/products/<product_id>', methods=['GET', 'POST', 'DELETE'])
+def handle_product_api(product_id):
+    product = ProductsModel.query.get_or_404(product_id)
+
+    if request.method == 'GET':
+        response = {
+            "id" : product.id,
+            "bmpid": product.bmpid,
+            "desc": product.desc,
+            "customer": product.customer,
+            "lastqc": product.lastqc,
+            "requirements": product.requirements
+        }
+        return {"message": "success", "product": response}
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        exists = False
+        if (product.bmpid != data['bmpid']):
+            exists = False
+            products = ProductsModel.query.all()
+            for product in products:
+                if (product.bmpid == data['bmpid']):
+                    exists = True
+
+        if exists:
+            exists = False
+            return {"Fail": f"Product not updated. BMP Product ID '{product.bmpid}' already exists."}
+        else:
+            product.bmpid = data['bmpid']
+            product.desc = data['desc']
+            product.customer = data['customer']
+            product.lastqc = data['lastqc']
+            product.requirements = data ['requirements']
+            db.session.add(product)
+            db.session.commit()
+            return {"Success": f"Product: '{product.desc} | {product.bmpid}' has been updated."}
+
+    elif request.method == 'DELETE':
+        qcRecords = ProductsModel.query.filter_by(id=product_id).first() #change this once qc table built
+        if (qcRecords): #change this to not qcRecords once QC table is built
+            db.session.delete(product)
+            db.session.commit()
+            return {"Success": f"Product: '{product.desc} | {product.bmpid}' successfully deleted."}
+        else:
+            return {"Fail": f"Product: '{product.desc} | {product.bmpid}' unable to be deleted since it has QC records tied to it."}
 
 
 '''

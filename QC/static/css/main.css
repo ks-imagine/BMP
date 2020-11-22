@@ -9242,3 +9242,18 @@ label.panel-block:hover {
   border: 1px solid #ddd;
   margin-bottom: 12px;
 }
+
+.content form {
+  margin: auto;
+  display: table;
+  text-align: left;
+}
+
+.content form p {
+  display: table-row;
+}
+
+.content form label,
+.content form input {
+  display: table-cell;
+}
