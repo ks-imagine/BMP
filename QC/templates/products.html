@@ -6,7 +6,7 @@
 <h1 class="title">
     All Products
 </h1>
-<h2><a onclick="toggleForm()">Add Product +</a></h2>
+<button id="myButton">Add Product +</button>
 <h3 style="color: green;">{{ status_good }}</h3>
 <h3 style="color: yellow;">{{ status_bad }}</h3>
 
@@ -21,34 +21,42 @@
 {% endwith %}
 
 
-
-<div class="center content" id="addProduct" style="display: none;">
-    <form method="POST">
-        <p>
-            <label for="bmpid">BMP Product Number &nbsp;&nbsp;&nbsp;</label>
-            <input type="number" id="bmpid" name="bmpid" value="12345">
-        </p>
-        <p>
-            <label for="desc">Product Description</label>
-            <input type="text" id="desc" name="desc" value="Doe">
-        </p>
-        <p>
-            <label for="customer">Customer</label>
-            <select id="customer" name="customer">
-                <option value="Blow Molded Products">Blow Molded Products</option>
-                <option value="HACH">HACH</option>
-                <option value="OTHER">OTHER</option>
-            </select>
-        </p>
-        <p>
-            <label for="requirements">Requirements</label>
-            <input type="text" id="requirements" name="requirements" value="">
-        </p>
-        <div>
-            <input type="submit" value="Submit">
+<div id="myModal" class="modal">
+    <div class="center content modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2>Add a Product</h2>
         </div>
-    </form>
+        <div class="modal-body">
+            <form method="POST">
+                <p>
+                    <label for="bmpid">BMP Product Number &nbsp;&nbsp;&nbsp;</label>
+                    <input type="number" id="bmpid" name="bmpid" value="12345">
+                </p>
+                <p>
+                    <label for="desc">Product Description</label>
+                    <input type="text" id="desc" name="desc" value="Doe">
+                </p>
+                <p>
+                    <label for="customer">Customer</label>
+                    <select id="customer" name="customer">
+                        <option value="Blow Molded Products">Blow Molded Products</option>
+                        <option value="HACH">HACH</option>
+                        <option value="OTHER">OTHER</option>
+                    </select>
+                </p>
+                <p>
+                    <label for="requirements">Requirements</label>
+                    <input type="text" id="requirements" name="requirements" value="">
+                </p>
+                <div>
+                    <input type="submit" value="Submit">
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
 <h3>
     <div class="center content" style="max-width: 75%; width: 100%;">
         <input type="text" id="productSearch" onkeyup="searchTable()" placeholder="Search..." title="Type in a name">
@@ -76,7 +84,7 @@
                     <td class="reqs">{{ product.requirements}}</td>
                     {% if current_user.is_authenticated %}
                     <!-- <td><img src="../static/edit.png"></td> -->
-                    <td><a onclick="deleteProduct({{ product.id }}, {{ product.bmpid }}, '{{ product.desc }}')"><img src="../static/trash.png"></a></td>
+                    <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/trash.png"></a></td>
                     {% endif %}
                 </tr>
             </tbody>
@@ -103,5 +111,32 @@
             document.getElementsByClassName("reqs")[i].innerHTML += (key + " = " + value);
         }
     }
+</script>
+<script>
+    window.onload = function() {
+        // Get the modal
+        var modal = document.getElementById("myModal");
+        // Get the button that opens the modal
+        var productAddButton = document.getElementById("myButton");
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        productAddButton.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    };
 </script>
 {% endblock %}

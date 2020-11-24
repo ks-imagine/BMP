@@ -61,52 +61,34 @@ function sortTable(n) {
 }
 
 function searchTable() {
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("productSearch");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("productTable");
-    tr = table.getElementsByTagName("tr");
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[0];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("productSearch");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("productTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
       }
     }
   }
+}
 
-function deleteProduct(productID, bmpID, desc){
+function deleteProduct(productID) {
   $.ajax({
-      url: 'products/' + productID,
-      type: "DELETE",
-      success : function(msg) {
-        window.location.href = '/products';
-      },
-      error: function(jqXHR, textStatus) {
-          alert('Error Occured'); //MESSAGE
-          window.location.href = '/products';
-      }
+    url: "products/" + productID,
+    type: "DELETE",
+    success: function (msg) {
+      window.location.href = "/products";
+    },
+    error: function (jqXHR, textStatus) {
+      alert("Error Occured"); //MESSAGE
+      window.location.href = "/products";
+    },
   });
-}
-
-function toggleForm() {
-  var x = document.getElementById("addProduct");
-  if (x.style.display === "none") {
-      x.style.display = "block";
-  } else {
-      x.style.display = "none";
-  }
-}
-
-function toggleForm() {
-  var x = document.getElementById("addProduct");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-      x.style.display = "none";
-  }
 }
