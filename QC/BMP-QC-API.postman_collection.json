@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4b6bbaa5-3738-445f-8d2c-37b8efd51ec5",
+		"_postman_id": "931563b2-ed03-40cc-9300-11b8d727a617",
 		"name": "BMP-QC-API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -34,7 +34,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5000/products",
+					"raw": "http://127.0.0.1:5000/api/products",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -44,6 +44,7 @@
 					],
 					"port": "5000",
 					"path": [
+						"api",
 						"products"
 					]
 				}
@@ -57,7 +58,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Test Product\",\r\n    \"model\" : \"TP-1234\",\r\n    \"weight\" : 5,\r\n    \"client\" : \"Test Company\"\r\n}",
+					"raw": "{\r\n    \"bmpid\": 123499,\r\n    \"customer\": \"Blow Molded Products\",\r\n    \"desc\": \"Doe\",\r\n    \"id\": 1,\r\n    \"lastqc\": \"Thu, 26 Nov 2020 18:11:18 GMT\",\r\n    \"requirements\": {\r\n      \"color\": \"blue\",\r\n      \"size\": 100\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -65,7 +66,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5000/products",
+					"raw": "http://127.0.0.1:5000/api/products",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -75,6 +76,7 @@
 					],
 					"port": "5000",
 					"path": [
+						"api",
 						"products"
 					]
 				}
@@ -87,7 +89,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5000/products/1",
+					"raw": "http://127.0.0.1:5000/api/products/1",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -97,6 +99,7 @@
 					],
 					"port": "5000",
 					"path": [
+						"api",
 						"products",
 						"1"
 					]
@@ -107,7 +110,7 @@
 		{
 			"name": "Update Product",
 			"request": {
-				"method": "PUT",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -119,7 +122,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5000/products/1",
+					"raw": "http://127.0.0.1:5000/api/products/1",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -129,6 +132,7 @@
 					],
 					"port": "5000",
 					"path": [
+						"api",
 						"products",
 						"1"
 					]
@@ -142,7 +146,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5000/products/1",
+					"raw": "http://127.0.0.1:5000/api/products/1",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -152,6 +156,7 @@
 					],
 					"port": "5000",
 					"path": [
+						"api",
 						"products",
 						"1"
 					]

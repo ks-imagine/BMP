@@ -69,7 +69,7 @@
                     <th onclick="sortTable(3)"> Last QC Record </th>
                     <th onclick="sortTable(4)"> Requirements </th>
                     {% if current_user.is_authenticated %}
-                    <!-- <th>Edit</th> -->
+                    <th>Edit</th>
                     <th>Delete</th>
                     {% endif %}
                 </tr>
@@ -83,7 +83,7 @@
                     <td>{{ product.lastqc }}</td>
                     <td class="reqs">{{ product.requirements}}</td>
                     {% if current_user.is_authenticated %}
-                    <!-- <td><img src="../static/edit.png"></td> -->
+                    <td><img src="../static/edit.png"></td>
                     <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/trash.png"></a></td>
                     {% endif %}
                 </tr>

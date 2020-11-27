@@ -1,9 +1,8 @@
 from flask_login import LoginManager, UserMixin, login_required, current_user, login_user, logout_user
-from flask import Flask, render_template, Blueprint, redirect, url_for, request, flash, json, jsonify
+from flask import Flask, render_template, redirect, url_for, request, flash, json
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
-import sys
 from datetime import datetime
 
 
@@ -112,12 +111,12 @@ def login_post():
     return redirect(url_for('index'))
 
 @app.route('/signup')
-# @login_required
+@login_required
 def signup():
     return render_template('signup.html')
 
 @app.route('/signup', methods=['POST'])
-# @login_required
+@login_required
 def signup_post():
 
     email = request.form.get('email')
@@ -333,7 +332,11 @@ def handle_products_api():
     elif request.method == 'POST':
         if request.is_json:
             data = request.get_json()
-            new_product = ProductsModel(bmpid=data['bmpid'], desc=data['desc'], customer=data['customer'], lastqc=data['lastqc'], requirements=data['requirements'])
+            lastqc = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            requirements = data['requirements']
+            if not requirements:
+                requirements = "{\"None\" : \"N/A\"}"
+            new_product = ProductsModel(bmpid=data['bmpid'], desc=data['desc'], customer=data['customer'], lastqc=lastqc, requirements=requirements)
             if not check_product_exists(new_product):
                 db.session.add(new_product)
                 db.session.commit()
