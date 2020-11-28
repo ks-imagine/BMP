@@ -58,3 +58,16 @@ Kindly ensure you have the following installed:
     ```
 
 7. Navigate to `http://localhost:5000/products` to view the products data.
+
+
+
+### Creating/Updating DB Tables
+
+1. Create a `Model` of the new table or upgrade an existing model in the `app.py` file.
+
+2. Execute the migrations to create/update the new table(s):
+
+    ```
+    $ flask db migrate
+    $ flask db upgrade
+    ```

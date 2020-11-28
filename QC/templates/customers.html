@@ -1,0 +1,101 @@
+<!-- templates/customers.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title bmp-title">
+    All Customers
+</h1>
+<button id="add-customer-button" class="cursor-pointer">Add Customer +</button>
+<h3 style="color: green;">{{ status_good }}</h3>
+<h3 style="color: yellow;">{{ status_bad }}</h3>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <h3 style="color: red;">
+        {{ message }}
+    </h3>
+    {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+<div id="myModal" class="modal">
+    <div class="center content modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2>Add a Customer</h2>
+        </div>
+        <div class="modal-body">
+            <form method="POST">
+                <p>
+                    <label for="customer">Customer Name &nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <input type="text" id="customer" name="customer" value="Sample Customer">
+                </p>
+                <div>
+                    <input type="submit" value="Submit" class="cursor-pointer">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<h3>
+    <div class="center content" style="max-width: 75%; width: 100%;">
+        <input type="text" id="customerSearch" onkeyup="searchTable('customerSearch', 'customerTable')" placeholder="Search..." title="Search customers...">
+        <table id="customerTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'customerTable')"> ID# </th>
+                    <th onclick="sortTable(1, 'customerTable')"> Customer Name </th>
+                    {% if current_user.is_authenticated %}
+                    <th style="cursor: initial;">Edit</th>
+                    <th style="cursor: initial;">Delete</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            {% for customer in results %}
+            <tbody>
+                <tr>
+                    <td>{{ customer.id }}</td>
+                    <td>{{ customer.customer }}</td>
+                    {% if current_user.is_authenticated %}
+                    <td><a onclick="editCustomer({{ customer.id }})"><img src="../static/edit.png"></a></td>
+                    <td><a onclick="deleteCustomer({{ customer.id }})"><img src="../static/trash.png"></a></td>
+                    {% endif %}
+                </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+        <h4>{{ no_customers }}</h4>
+    </div>
+</h3>
+<script>
+    window.onload = function() {
+        // Get the modal
+        var modal = document.getElementById("myModal");
+        // Get the button that opens the modal
+        var customerAddButton = document.getElementById("add-customer-button");
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        customerAddButton.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    };
+</script>
+{% endblock %}

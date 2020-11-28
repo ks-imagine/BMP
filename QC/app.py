@@ -1,7 +1,9 @@
+from flask.signals import request_finished
 from flask_login import LoginManager, UserMixin, login_required, current_user, login_user, logout_user
 from flask import Flask, render_template, redirect, url_for, request, flash, json
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_migrate import Migrate, downgrade
+from sqlalchemy.sql.schema import ForeignKey
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
@@ -55,7 +57,7 @@ class ProductsModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     bmpid = db.Column(db.Integer(), unique=True)
     desc = db.Column(db.String())
-    customer = db.Column(db.String())
+    customer = db.Column(db.String(), ForeignKey("customers.customer"))
     lastqc = db.Column(db.DateTime())
     requirements = db.Column(db.JSON())
 
@@ -69,6 +71,18 @@ class ProductsModel(db.Model):
     def __repr__(self):
         return f"<Product {self.bmpid}>"
 
+
+class CustomersModel(db.Model):
+    __tablename__ = 'customers'
+
+    id = db.Column(db.Integer, primary_key=True)
+    customer = db.Column(db.String(), unique=True)
+
+    def __init__(self, customer):
+        self.customer = customer
+
+    def __repr__(self):
+        return f"<Customer {self.customer}>"
 
 '''
  ______________
@@ -111,12 +125,12 @@ def login_post():
     return redirect(url_for('index'))
 
 @app.route('/signup')
-@login_required
+# @login_required
 def signup():
     return render_template('signup.html')
 
 @app.route('/signup', methods=['POST'])
-@login_required
+# @login_required
 def signup_post():
 
     email = request.form.get('email')
@@ -183,9 +197,18 @@ def index():
 def profile():
     return render_template('profile.html', name=current_user.name)
 
+
+
+# Product Pages
 @app.route('/products', methods=['POST', 'GET'])
 @login_required
 def handle_products():
+    customers = CustomersModel.query.all()
+    customerResults = [
+        {
+            "id" : customer.id,
+            "customer": customer.customer
+        } for customer in customers]
     if request.method == 'POST':
         bmpid = int(request.form.get("bmpid"))
         desc = request.form.get("desc")
@@ -210,7 +233,7 @@ def handle_products():
                     "lastqc": product.lastqc,
                     "requirements": product.requirements
                 } for product in products]
-            return render_template('products.html', results=results, status_good=f"Success! Product: '{new_product.desc} | {new_product.bmpid}' has been created.")
+            return render_template('products.html', results=results, customerResults=customerResults, status_good=f"Success! Product: '{new_product.desc} | {new_product.bmpid}' has been created.")
         else:
             products = ProductsModel.query.all()
             results = [
@@ -222,7 +245,7 @@ def handle_products():
                     "lastqc": product.lastqc,
                     "requirements": product.requirements
                 } for product in products]
-            return render_template('products.html', results=results, status_bad=f"Fail...  BMP Product ID: '{new_product.bmpid}' already exists.")
+            return render_template('products.html', results=results, customerResults=customerResults, status_bad=f"Fail...  BMP Product ID: '{new_product.bmpid}' already exists.")
 
     elif request.method == 'GET':
         products = ProductsModel.query.all()
@@ -236,11 +259,9 @@ def handle_products():
                 "requirements": product.requirements
             } for product in products]
         if len(results) == 0:
-            return render_template('products.html', no_products="No Products to Display")
+            return render_template('products.html', customerResults=customerResults, no_products="No Products to Display")
         else:
-            return render_template('products.html', results=results)
-
-
+            return render_template('products.html', results=results, customerResults=customerResults)
 
 @app.route('/products/<product_id>', methods=['GET', 'POST', 'DELETE'])
 def handle_product(product_id):
@@ -258,27 +279,10 @@ def handle_product(product_id):
         return {"message": "success", "product": response}
 
     elif request.method == 'POST':
-        data = request.get_json()
-        exists = False
-        if (product.bmpid != data['bmpid']):
-            exists = False
-            products = ProductsModel.query.all()
-            for product in products:
-                if (product.bmpid == data['bmpid']):
-                    exists = True
-
-        if exists:
-            exists = False
-            return {"Fail": f"Product not updated. BMP Product ID '{product.bmpid}' already exists."}
-        else:
-            product.bmpid = data['bmpid']
-            product.desc = data['desc']
-            product.customer = data['customer']
-            product.lastqc = data['lastqc']
-            product.requirements = data ['requirements']
-            db.session.add(product)
-            db.session.commit()
-            return {"Success": f"Product: '{product.desc} | {product.bmpid}' has been updated."}
+        # This will update the product in the product table.
+        # If editing the BMP ID, then the QC table will need to be updated as well.
+        flash("OK")
+        return{"POST": "POST THINGY"}
 
     elif request.method == 'DELETE':
         qcRecords = ProductsModel.query.filter_by(id=product_id).first() #change this once qc table built
@@ -291,6 +295,78 @@ def handle_product(product_id):
             flash("Product unable to be deleted since it has QC records tied to it.")
             return {"Success": "Product not deleted."}
 
+
+
+# Customer Pages
+@app.route('/customers', methods=['POST', 'GET'])
+@login_required
+def handle_customers():
+    if request.method == 'POST':
+        customer = request.form.get("customer")
+
+        new_customer = CustomersModel(customer)
+        if not check_customer_exists(new_customer):
+            db.session.add(new_customer)
+            db.session.commit()
+            customers = CustomersModel.query.all()
+            results = [
+                {
+                    "id" : customer.id,
+                    "customer": customer.customer
+                } for customer in customers]
+            return render_template('customers.html', results=results, status_good=f"Success! Customer: '{new_customer.customer} | {new_customer.id}' has been created.")
+        else:
+            customers = CustomersModel.query.all()
+            results = [
+                {
+                    "id" : customer.id,
+                    "customer": customer.customer
+                } for customer in customers]
+            return render_template('customers.html', results=results, status_bad=f"Fail...  Customer: '{new_customer.customer}' already exists.")
+
+    elif request.method == 'GET':
+        customers = CustomersModel.query.all()
+        results = [
+            {
+                "id" : customer.id,
+                "customer": customer.customer
+            } for customer in customers]
+        if len(results) == 0:
+            return render_template('customers.html', no_customers="No Customers to Display")
+        else:
+            return render_template('customers.html', results=results)
+
+@app.route('/customers/<customer_id>', methods=['GET', 'POST', 'DELETE'])
+def handle_customer(customer_id):
+    customer = CustomersModel.query.get_or_404(customer_id)
+    customer_name = customer.customer
+
+    if request.method == 'GET':
+        response = {
+            "id" : customer.id,
+            "customer": customer.customer
+        }
+        return {"message": "success", "customer": response}
+
+    elif request.method == 'POST':
+        # This will update the customer name in the customers table.
+        # Only works if customer name doesn't exist.
+        # Update entries in product and qc tables.
+        flash("OK")
+        return{"POST": "POST THINGY"}
+
+    elif request.method == 'DELETE':
+        # qcRecords = QCModel.query.filter_by(customer=customer_name).first() #change this once qc table built
+        productRecords = ProductsModel.query.filter_by(customer=customer_name).first()
+        print(productRecords)
+        if (productRecords == None): #change this to not qcRecords once QC table is built
+            db.session.delete(customer)
+            db.session.commit()
+            flash("Customer successfully deleted.")
+            return {"Success": "Customer has been deleted."}
+        else:
+            flash("Customer unable to be deleted since it has Product or QC records tied to it.")
+            return {"Success": "Customer not deleted."}
 
 '''
  _____
@@ -418,6 +494,14 @@ def check_product_exists(_product):
     products = ProductsModel.query.all()
     for product in products:
         if (product.bmpid == _product.bmpid):
+            exists = True
+    return exists
+
+def check_customer_exists(_customer):
+    exists = False
+    customers = CustomersModel.query.all()
+    for customer in customers:
+        if (customer.customer == _customer.customer):
             exists = True
     return exists
 

@@ -30,6 +30,9 @@
                             <a href="{{ url_for('handle_products') }}" class="navbar-item">
                                 Products
                             </a>
+                            <a href="{{ url_for('handle_customers') }}" class="navbar-item">
+                                Customer
+                            </a>
                             {% endif %}
                             {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('login') }}" class="navbar-item">

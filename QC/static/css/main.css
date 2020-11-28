@@ -2552,14 +2552,16 @@ a.box:active {
 .content table {
   width: 100%;
 }
-.content table td,
-.content table th {
-  border: 1px solid #dbdbdb;
+.content table td{
   border-width: 0 0 1px;
   padding: 0.5em 0.75em;
   vertical-align: top;
 }
 .content table th {
+  border: 1px solid #dbdbdb;
+  border-width: 0 0 1px;
+  padding: 0.5em 0.75em;
+  vertical-align: top;
   color: #ffffff;
   text-align: left;
   cursor: pointer;
@@ -9241,7 +9243,15 @@ label.panel-block:hover {
   padding: 10px;
 }
 
-#productSearch {
+.bmp-title {
+  margin-bottom: 10px !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+#productSearch, #customerSearch {
   background-image: url("searchicon.png");
   background-position: 10px 12px;
   background-repeat: no-repeat;
@@ -9290,12 +9300,15 @@ label.panel-block:hover {
   position: fixed;
   bottom: 50%;
   left: 15%;
-  background-color: #fefefe;
   width: 70%;
   -webkit-animation-name: slideIn;
   -webkit-animation-duration: 0.4s;
   animation-name: slideIn;
   animation-duration: 0.4s;
+  border-radius: 25px;
+  background: dimgrey;
+  background-image: url("../dark-sand.jpg");
+  padding: 20px;
 }
 
 /* The Close Button */
@@ -9315,7 +9328,6 @@ label.panel-block:hover {
 
 .modal-header {
   padding: 2px 16px;
-  background-color: #5cb85c;
   color: white;
 }
 

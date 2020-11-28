@@ -1,4 +1,4 @@
-function sortTable(n) {
+function sortTable(n, tableName) {
   var table,
     rows,
     switching,
@@ -8,7 +8,7 @@ function sortTable(n) {
     shouldSwitch,
     dir,
     switchcount = 0;
-  table = document.getElementById("productTable");
+  table = document.getElementById(tableName);
   switching = true;
   //Set the sorting direction to ascending:
   dir = "asc";
@@ -60,11 +60,11 @@ function sortTable(n) {
   }
 }
 
-function searchTable() {
+function searchTable(search, table) {
   var input, filter, table, tr, td, i, j;
-  input = document.getElementById("productSearch");
+  input = document.getElementById(search);
   filter = input.value.toUpperCase();
-  table = document.getElementById("productTable");
+  table = document.getElementById(table);
   tr = table.getElementsByTagName("tr");
   for (i = 0; i < tr.length; i++) {
     (td = tr[i].getElementsByTagName("td")), (match = false);
@@ -83,20 +83,6 @@ function searchTable() {
 }
 
 function deleteProduct(productID) {
-  $.ajax({
-    url: "products/" + productID,
-    type: "DELETE",
-    success: function (msg) {
-      window.location.href = "/products";
-    },
-    error: function (jqXHR, textStatus) {
-      alert("Error Occured"); //MESSAGE
-      window.location.href = "/products";
-    },
-  });
-}
-
-function deleteProduct2(productID) {
   fetch(`products/` + productID, { method: "DELETE" })
     .then((response) => {
       window.location.href = "/products";
@@ -104,5 +90,30 @@ function deleteProduct2(productID) {
     .catch((error) => {
       alert("Error Occured"); //MESSAGE
       window.location.href = "/products";
+    });
+}
+
+function editProduct(productID) {
+  fetch(`products/` + productID, {
+    method: "POST"
+  })
+    .then((response) => {
+      // window.location.href = "/products";
+    })
+    .catch((error) => {
+      alert("Error Occured"); //MESSAGE
+      // window.location.href = "/products";
+    });
+    window.location.href = "/products";
+}
+
+function deleteCustomer(customerID) {
+  fetch(`customers/` + customerID, { method: "DELETE" })
+    .then((response) => {
+      window.location.href = "/customers";
+    })
+    .catch((error) => {
+      alert("Error Occured"); //MESSAGE
+      window.location.href = "/customers";
     });
 }
