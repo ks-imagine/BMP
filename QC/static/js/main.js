@@ -61,20 +61,23 @@ function sortTable(n) {
 }
 
 function searchTable() {
-  var input, filter, table, tr, td, i, txtValue;
+  var input, filter, table, tr, td, i, j;
   input = document.getElementById("productSearch");
   filter = input.value.toUpperCase();
   table = document.getElementById("productTable");
   tr = table.getElementsByTagName("tr");
   for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
+    (td = tr[i].getElementsByTagName("td")), (match = false);
+    for (j = 0; j < td.length; j++) {
+      if (td[j].innerHTML.toUpperCase().indexOf(filter) > -1) {
+        match = true;
+        break;
       }
+    }
+    if (!match) {
+      tr[i].style.display = "none";
+    } else {
+      tr[i].style.display = "";
     }
   }
 }
@@ -91,4 +94,15 @@ function deleteProduct(productID) {
       window.location.href = "/products";
     },
   });
+}
+
+function deleteProduct2(productID) {
+  fetch(`products/` + productID, { method: "DELETE" })
+    .then((response) => {
+      window.location.href = "/products";
+    })
+    .catch((error) => {
+      alert("Error Occured"); //MESSAGE
+      window.location.href = "/products";
+    });
 }
