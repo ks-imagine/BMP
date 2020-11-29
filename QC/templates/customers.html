@@ -41,36 +41,34 @@
     </div>
 </div>
 
-<h3>
-    <div class="center content" style="max-width: 75%; width: 100%;">
-        <input type="text" id="customerSearch" onkeyup="searchTable('customerSearch', 'customerTable')" placeholder="Search..." title="Search customers...">
-        <table id="customerTable" class="bmp-table">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0, 'customerTable')"> ID# </th>
-                    <th onclick="sortTable(1, 'customerTable')"> Customer Name </th>
-                    {% if current_user.is_authenticated %}
-                    <th style="cursor: initial;">Edit</th>
-                    <th style="cursor: initial;">Delete</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            {% for customer in results %}
-            <tbody>
-                <tr>
-                    <td>{{ customer.id }}</td>
-                    <td>{{ customer.customer }}</td>
-                    {% if current_user.is_authenticated %}
-                    <td><a onclick="editCustomer({{ customer.id }})"><img src="../static/edit.png"></a></td>
-                    <td><a onclick="deleteCustomer({{ customer.id }})"><img src="../static/trash.png"></a></td>
-                    {% endif %}
-                </tr>
-            </tbody>
-            {% endfor %}
-        </table>
-        <h4>{{ no_customers }}</h4>
-    </div>
-</h3>
+<div class="center content" style="max-width: 75%; width: 100%;">
+    <input type="text" id="customerSearch" onkeyup="searchTable('customerSearch', 'customerTable')" placeholder="Search..." title="Search customers...">
+    <table id="customerTable" class="bmp-table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0, 'customerTable')"> ID# </th>
+                <th onclick="sortTable(1, 'customerTable')"> Customer Name </th>
+                {% if current_user.is_authenticated %}
+                <th style="cursor: initial;">Edit</th>
+                <th style="cursor: initial;">Delete</th>
+                {% endif %}
+            </tr>
+        </thead>
+        {% for customer in results %}
+        <tbody>
+            <tr>
+                <td>{{ customer.id }}</td>
+                <td>{{ customer.customer }}</td>
+                {% if current_user.is_authenticated %}
+                <td><a onclick="editCustomer({{ customer.id }})"><img src="../static/edit.png"></a></td>
+                <td><a onclick="deleteCustomer({{ customer.id }})"><img src="../static/trash.png"></a></td>
+                {% endif %}
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+    <h4>{{ no_customers }}</h4>
+</div>
 <script>
     window.onload = function() {
         // Get the modal

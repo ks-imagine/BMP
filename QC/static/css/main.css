@@ -8652,13 +8652,14 @@ label.panel-block:hover {
   }
 }
 .hero.is-primary {
-  background-color: #141e30;
+  background-color: #252525;
   background-image: url("../background.jpg");
   height: 100%;
   background-position: center;
-  background-repeat: no-repeat;
   background-size: cover;
+  background-repeat: no-repeat;
   position: relative;
+  background-attachment: fixed;
   color: #fff;
   /* background-image: linear-gradient( to bottom,#141e30 0%, #243b55 100% ); */
 }

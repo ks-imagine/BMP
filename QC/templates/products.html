@@ -34,8 +34,8 @@
                     <input type="number" id="bmpid" name="bmpid" value="12345">
                 </p>
                 <p>
-                    <label for="desc">Product Description</label>
-                    <input type="text" id="desc" name="desc" value="Doe">
+                    <label for="description">Product Description</label>
+                    <input type="text" id="description" name="description" value="Doe">
                 </p>
                 <p>
                     <label for="customer">Customer</label>
@@ -56,43 +56,40 @@
         </div>
     </div>
 </div>
-
-<h3>
-    <div class="center content" style="max-width: 75%; width: 100%;">
-        <input type="text" id="productSearch" onkeyup="searchTable('productSearch', 'productTable')" placeholder="Search..." title="Search products...">
-        <table id="productTable" class="bmp-table">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0, 'productTable')"> BMP ID# </th>
-                    <th onclick="sortTable(1, 'productTable')"> Product Description </th>
-                    <th onclick="sortTable(2, 'productTable')"> Customer </th>
-                    <th onclick="sortTable(3, 'productTable')"> Last QC Record </th>
-                    <th onclick="sortTable(4, 'productTable')"> Requirements </th>
-                    {% if current_user.is_authenticated %}
-                    <th style="cursor: initial;">Edit</th>
-                    <th style="cursor: initial;">Delete</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            {% for product in results %}
-            <tbody>
-                <tr>
-                    <td>{{ product.bmpid }}</td>
-                    <td>{{ product.desc }}</td>
-                    <td>{{ product.customer }}</td>
-                    <td>{{ product.lastqc }}</td>
-                    <td class="reqs">{{ product.requirements}}</td>
-                    {% if current_user.is_authenticated %}
-                    <td><a onclick="editProduct({{ product.id }})"><img src="../static/edit.png"></a></td>
-                    <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/trash.png"></a></td>
-                    {% endif %}
-                </tr>
-            </tbody>
-            {% endfor %}
-        </table>
-        <h4>{{ no_products }}</h4>
-    </div>
-</h3>
+<div class="center content" style="max-width: 75%; width: 100%;">
+    <input type="text" id="productSearch" onkeyup="searchTable('productSearch', 'productTable')" placeholder="Search..." title="Search products...">
+    <table id="productTable" class="bmp-table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0, 'productTable')"> BMP ID# </th>
+                <th onclick="sortTable(1, 'productTable')"> Product Description </th>
+                <th onclick="sortTable(2, 'productTable')"> Customer </th>
+                <!-- <th onclick="sortTable(3, 'productTable')"> Last QC Record </th> -->
+                <th onclick="sortTable(3, 'productTable')"> Requirements </th>
+                {% if current_user.is_authenticated %}
+                <th style="cursor: initial;">Edit</th>
+                <th style="cursor: initial;">Delete</th>
+                {% endif %}
+            </tr>
+        </thead>
+        {% for product in results %}
+        <tbody>
+            <tr>
+                <td>{{ product.bmpid }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ product.customer }}</td>
+                <!-- <td>{{ product.lastqc }}</td> -->
+                <td class="reqs">{{ product.requirements}}</td>
+                {% if current_user.is_authenticated %}
+                <td><a onclick="editProduct({{ product.id }})"><img src="../static/edit.png"></a></td>
+                <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/trash.png"></a></td>
+                {% endif %}
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+    <h4>{{ no_products }}</h4>
+</div>
 <script>
     var x = document.getElementsByClassName("reqs").length;
     for (var i = 0; i < x; i++) {

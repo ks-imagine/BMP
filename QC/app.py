@@ -75,13 +75,13 @@ class ProductsModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     bmpid = db.Column(db.Integer(), unique=True)
-    desc = db.Column(db.String())
+    description = db.Column(db.String())
     customer = db.Column(db.String(), ForeignKey("customers.customer"))
     requirements = db.Column(db.JSON())
 
-    def __init__(self, bmpid, desc, customer, requirements):
+    def __init__(self, bmpid, description, customer, requirements):
         self.bmpid = bmpid
-        self.desc = desc
+        self.description = description
         self.customer = customer
         self.requirements = requirements
 
@@ -223,7 +223,7 @@ def handle_logs():
     productResults = [
         {
             "bmpid": product.bmpid,
-            "desc": product.desc,
+            "description": product.description,
             "customer": product.customer,
             "requirements": product.requirements
         } for product in products]
@@ -239,25 +239,28 @@ def handle_logs():
         new_log = LogsModel(bmpid, lastqc, user, requirements)
         db.session.add(new_log)
         db.session.commit()
-        logs = LogsModel.query.order_by(desc('lastqc'))
+        logs = db.session.query(LogsModel.id, LogsModel.bmpid, LogsModel.lastqc, LogsModel.user, LogsModel.requirements, ProductsModel.description).join(ProductsModel).order_by(desc('lastqc'))
+
         results = [
             {
                 "id" : log.id,
                 "bmpid": log.bmpid,
                 "lastqc": log.lastqc,
                 "user" : log.user,
-                "requirements": log.requirements
+                "requirements": log.requirements,
+                "description": log.description
             } for log in logs]
         return render_template('logs.html', results=results, productResults=productResults, status_good=f"Success! Log: '{new_log.id}' has been created.")
     elif request.method == 'GET':
-        logs = LogsModel.query.order_by(desc('lastqc'))
+        logs = db.session.query(LogsModel.id, LogsModel.bmpid, LogsModel.lastqc, LogsModel.user, LogsModel.requirements, ProductsModel.description).join(ProductsModel).order_by(desc('lastqc'))
         results = [
             {
                 "id" : log.id,
                 "bmpid": log.bmpid,
                 "lastqc": log.lastqc,
                 "user" : log.user,
-                "requirements": log.requirements
+                "requirements": log.requirements,
+                "description": log.description
             } for log in logs]
         if len(results) == 0:
             return render_template('logs.html', productResults=productResults, no_logs="No Logs to Display")
@@ -307,46 +310,46 @@ def handle_products():
         } for customer in customers]
     if request.method == 'POST':
         bmpid = int(request.form.get("bmpid"))
-        desc = request.form.get("desc")
+        description = request.form.get("description")
         customer = request.form.get("customer")
         requirements = request.form.get("requirements")
         if not requirements:
             requirements = "{\"None\" : \"N/A\"}"
         requirements = json.loads(requirements)
 
-        new_product = ProductsModel(bmpid, desc, customer, requirements)
+        new_product = ProductsModel(bmpid, description, customer, requirements)
         if not check_product_exists(new_product):
             db.session.add(new_product)
             db.session.commit()
-            products = ProductsModel.query.all()
+            products = ProductsModel.query.order_by(desc('bmpid'))
             results = [
                 {
                     "id" : product.id,
                     "bmpid": product.bmpid,
-                    "desc": product.desc,
+                    "description": product.description,
                     "customer": product.customer,
                     "requirements": product.requirements
                 } for product in products]
-            return render_template('products.html', results=results, customerResults=customerResults, status_good=f"Success! Product: '{new_product.desc} | {new_product.bmpid}' has been created.")
+            return render_template('products.html', results=results, customerResults=customerResults, status_good=f"Success! Product: '{new_product.description} | {new_product.bmpid}' has been created.")
         else:
-            products = ProductsModel.query.all()
+            products = ProductsModel.query.order_by(desc('bmpid'))
             results = [
                 {
                     "id" : product.id,
                     "bmpid": product.bmpid,
-                    "desc": product.desc,
+                    "description": product.description,
                     "customer": product.customer,
                     "requirements": product.requirements
                 } for product in products]
             return render_template('products.html', results=results, customerResults=customerResults, status_bad=f"Fail...  BMP Product ID: '{new_product.bmpid}' already exists.")
 
     elif request.method == 'GET':
-        products = ProductsModel.query.all()
+        products = ProductsModel.query.order_by(desc('bmpid'))
         results = [
             {
                 "id" : product.id,
                 "bmpid": product.bmpid,
-                "desc": product.desc,
+                "description": product.description,
                 "customer": product.customer,
                 "requirements": product.requirements
             } for product in products]
@@ -364,7 +367,7 @@ def handle_product(product_id):
         response = {
             "id" : product.id,
             "bmpid": product.bmpid,
-            "desc": product.desc,
+            "description": product.description,
             "customer": product.customer,
             "requirements": product.requirements
         }

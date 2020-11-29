@@ -49,44 +49,42 @@
     </div>
 </div>
 
-<h3>
-    <div class="center content" style="max-width: 75%; width: 100%;">
-        <input type="text" id="logSearch" onkeyup="searchTable('logSearch', 'logTable')" placeholder="Search..." title="Search logs...">
-        <table id="logTable" class="bmp-table">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0, 'logTable')"> Log ID# </th>
-                    <th onclick="sortTable(1, 'logTable')"> BMP ID# </th>
-                    <th onclick="sortTable(2, 'logTable')"> Product Description </th>
-                    <th onclick="sortTable(3, 'logTable')"> Last QC Record </th>
-                    <th onclick="sortTable(4, 'logTable')"> User </th>
-                    <th onclick="sortTable(5, 'logTable')"> Requirements </th>
-                    {% if current_user.is_authenticated %}
-                    <th style="cursor: initial;">Edit</th>
-                    <th style="cursor: initial;">Delete</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            {% for log in results %}
-            <tbody>
-                <tr>
-                    <td>{{ log.id }}</td>
-                    <td>{{ log.bmpid }}</td>
-                    <td>{{ log.desc }}</td>
-                    <td>{{ log.lastqc }}</td>
-                    <td>{{ log.user }}</td>
-                    <td class="reqs">{{ log.requirements}}</td>
-                    {% if current_user.is_authenticated %}
-                    <td><a onclick="editLog({{ log.id }})"><img src="../static/edit.png"></a></td>
-                    <td><a onclick="deleteLog({{ log.id }})"><img src="../static/trash.png"></a></td>
-                    {% endif %}
-                </tr>
-            </tbody>
-            {% endfor %}
-        </table>
-        <h4>{{ no_logs }}</h4>
-    </div>
-</h3>
+<div class="center content" style="max-width: 75%; width: 100%;">
+    <input type="text" id="logSearch" onkeyup="searchTable('logSearch', 'logTable')" placeholder="Search..." title="Search logs...">
+    <table id="logTable" class="bmp-table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0, 'logTable')"> Log ID# </th>
+                <th onclick="sortTable(1, 'logTable')"> BMP ID# </th>
+                <th onclick="sortTable(2, 'logTable')"> Product Description </th>
+                <th onclick="sortTable(3, 'logTable')"> Date / Time(PT) </th>
+                <th onclick="sortTable(4, 'logTable')"> User </th>
+                <th onclick="sortTable(5, 'logTable')"> Requirements </th>
+                {% if current_user.is_authenticated %}
+                <th style="cursor: initial;">Edit</th>
+                <th style="cursor: initial;">Delete</th>
+                {% endif %}
+            </tr>
+        </thead>
+        {% for log in results %}
+        <tbody>
+            <tr>
+                <td>{{ log.id }}</td>
+                <td>{{ log.bmpid }}</td>
+                <td>{{ log.description }}</td>
+                <td>{{ log.lastqc }}</td>
+                <td>{{ log.user }}</td>
+                <td class="reqs">{{ log.requirements}}</td>
+                {% if current_user.is_authenticated %}
+                <td><a onclick="editLog({{ log.id }})"><img src="../static/edit.png"></a></td>
+                <td><a onclick="deleteLog({{ log.id }})"><img src="../static/trash.png"></a></td>
+                {% endif %}
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+    <h4>{{ no_logs }}</h4>
+</div>
 <script>
     var x = document.getElementsByClassName("reqs").length;
     for (var i = 0; i < x; i++) {
