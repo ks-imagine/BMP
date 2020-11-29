@@ -60,6 +60,8 @@ Kindly ensure you have the following installed:
 7. Navigate to `http://localhost:5000/products` to view the products data.
 
 
+## Maintanence and Updates
+
 
 ### Creating/Updating DB Tables
 
