@@ -1,6 +1,6 @@
-# BMP | Quality Control API
+# BMP | Quality Control Application
 
-BMP QC API repository. uWu
+BMP QC Application repository. uWu
 
 
 ## Getting Started
@@ -43,7 +43,7 @@ Kindly ensure you have the following installed:
     $ export FLASK_APP=app.py
     ```
 
-5. Execute the migrations to create the `products` table:
+5. Execute the migrations to create the database tables:
 
     ```
     $ flask db init
@@ -57,7 +57,7 @@ Kindly ensure you have the following installed:
     $ flask run
     ```
 
-7. Navigate to `http://localhost:5000/products` to view the products data.
+7. Navigate to `http://localhost:5000/` to view the application.
 
 
 ## Maintanence and Updates
