@@ -30,11 +30,11 @@ Kindly ensure you have the following installed:
     $ pip install -r requirements.txt
     ```
 
-3. Create a PostgreSQL user with the username and password `postgres` and create a database called `bmp-qc-api`:
+3. Create a PostgreSQL user with the username and password `postgres` and create a database called `bmp-qc`:
 
     ```
     $ createuser --interactive --pwprompt
-    $ createdb qc_api
+    $ createdb qc
     ```
 
 4. Export the required environment variables:
@@ -63,7 +63,7 @@ Kindly ensure you have the following installed:
 
 ### Creating/Updating DB Tables
 
-1. Create a `Model` of the new table or upgrade an existing model in the `app.py` file.
+1. Create a model of the new table or upgrade an existing model in the `app.py` file.
 
 2. Execute the migrations to create/update the new table(s):
 

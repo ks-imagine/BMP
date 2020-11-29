@@ -2,10 +2,11 @@ from flask.signals import request_finished
 from flask_login import LoginManager, UserMixin, login_required, current_user, login_user, logout_user
 from flask import Flask, render_template, redirect, url_for, request, flash, json
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate, downgrade
+from flask_migrate import Migrate
 from sqlalchemy.sql.schema import ForeignKey
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
+from sqlalchemy import desc
 
 
 app = Flask(__name__)
@@ -51,6 +52,25 @@ class UserModel(UserMixin, db.Model):
         return f"<Name {self.name}>"
 
 
+class LogsModel(db.Model):
+    __tablename__ = 'logs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    bmpid = db.Column(db.Integer(), ForeignKey("products.bmpid"))
+    lastqc = db.Column(db.DateTime())
+    user = db.Column(db.String())
+    requirements = db.Column(db.JSON())
+
+    def __init__(self, bmpid, lastqc, user, requirements):
+        self.bmpid = bmpid
+        self.lastqc = lastqc
+        self.user = user
+        self.requirements = requirements
+
+    def __repr__(self):
+        return f"<Log {self.id}>"
+
+
 class ProductsModel(db.Model):
     __tablename__ = 'products'
 
@@ -58,14 +78,12 @@ class ProductsModel(db.Model):
     bmpid = db.Column(db.Integer(), unique=True)
     desc = db.Column(db.String())
     customer = db.Column(db.String(), ForeignKey("customers.customer"))
-    lastqc = db.Column(db.DateTime())
     requirements = db.Column(db.JSON())
 
-    def __init__(self, bmpid, desc, customer, lastqc, requirements):
+    def __init__(self, bmpid, desc, customer, requirements):
         self.bmpid = bmpid
         self.desc = desc
         self.customer = customer
-        self.lastqc = lastqc
         self.requirements = requirements
 
     def __repr__(self):
@@ -198,6 +216,85 @@ def profile():
     return render_template('profile.html', name=current_user.name)
 
 
+# QC Pages
+@app.route('/logs', methods=['POST', 'GET'])
+@login_required
+def handle_logs():
+    products = ProductsModel.query.all()
+    productResults = [
+        {
+            "bmpid": product.bmpid,
+            "desc": product.desc,
+            "customer": product.customer,
+            "requirements": product.requirements
+        } for product in products]
+    if request.method == 'POST':
+        bmpid = int(request.form.get("bmpid"))
+        lastqc = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        user = current_user.name
+        requirements = request.form.get("requirements")
+        if not requirements:
+            requirements = "{\"None\" : \"N/A\"}"
+        requirements = json.loads(requirements)
+
+        new_log = LogsModel(bmpid, lastqc, user, requirements)
+        db.session.add(new_log)
+        db.session.commit()
+        logs = LogsModel.query.order_by(desc('lastqc'))
+        results = [
+            {
+                "id" : log.id,
+                "bmpid": log.bmpid,
+                "lastqc": log.lastqc,
+                "user" : log.user,
+                "requirements": log.requirements
+            } for log in logs]
+        return render_template('logs.html', results=results, productResults=productResults, status_good=f"Success! Log: '{new_log.id}' has been created.")
+    elif request.method == 'GET':
+        logs = LogsModel.query.order_by(desc('lastqc'))
+        results = [
+            {
+                "id" : log.id,
+                "bmpid": log.bmpid,
+                "lastqc": log.lastqc,
+                "user" : log.user,
+                "requirements": log.requirements
+            } for log in logs]
+        if len(results) == 0:
+            return render_template('logs.html', productResults=productResults, no_logs="No Logs to Display")
+        else:
+            return render_template('logs.html', productResults=productResults, results=results)
+
+@app.route('/logs/<log_id>', methods=['GET', 'POST', 'DELETE'])
+def handle_log(log_id):
+    log = LogsModel.query.get_or_404(log_id)
+    if request.method == 'GET':
+        response = {
+            "id" : log.id,
+            "bmpid": log.bmpid,
+            "lastqc": log.lastqc,
+            "user" : log.user,
+            "requirements": log.requirements
+        }
+        return {"message": "success", "product": response}
+
+    elif request.method == 'POST':
+        # This will update the product in the product table.
+        # If editing the BMP ID, then the QC table will need to be updated as well.
+        flash("OK")
+        return{"POST": "POST THINGY"}
+
+    elif request.method == 'DELETE':
+        logDate = LogsModel.query.filter_by(id=log_id).first()
+        if (logDate.lastqc > (datetime.now() - timedelta(days=1))):
+            db.session.delete(log)
+            db.session.commit()
+            flash("QC Log successfully deleted.")
+            return {"Success": "QC Log has been deleted."}
+        else:
+            flash("QC Log unable to be deleted since it was entered over 24 hours ago.")
+            return {"Success": "QC Log not deleted."}
+
 
 # Product Pages
 @app.route('/products', methods=['POST', 'GET'])
@@ -213,13 +310,12 @@ def handle_products():
         bmpid = int(request.form.get("bmpid"))
         desc = request.form.get("desc")
         customer = request.form.get("customer")
-        lastqc = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         requirements = request.form.get("requirements")
         if not requirements:
             requirements = "{\"None\" : \"N/A\"}"
         requirements = json.loads(requirements)
 
-        new_product = ProductsModel(bmpid, desc, customer, lastqc, requirements)
+        new_product = ProductsModel(bmpid, desc, customer, requirements)
         if not check_product_exists(new_product):
             db.session.add(new_product)
             db.session.commit()
@@ -230,7 +326,6 @@ def handle_products():
                     "bmpid": product.bmpid,
                     "desc": product.desc,
                     "customer": product.customer,
-                    "lastqc": product.lastqc,
                     "requirements": product.requirements
                 } for product in products]
             return render_template('products.html', results=results, customerResults=customerResults, status_good=f"Success! Product: '{new_product.desc} | {new_product.bmpid}' has been created.")
@@ -242,7 +337,6 @@ def handle_products():
                     "bmpid": product.bmpid,
                     "desc": product.desc,
                     "customer": product.customer,
-                    "lastqc": product.lastqc,
                     "requirements": product.requirements
                 } for product in products]
             return render_template('products.html', results=results, customerResults=customerResults, status_bad=f"Fail...  BMP Product ID: '{new_product.bmpid}' already exists.")
@@ -255,7 +349,6 @@ def handle_products():
                 "bmpid": product.bmpid,
                 "desc": product.desc,
                 "customer": product.customer,
-                "lastqc": product.lastqc,
                 "requirements": product.requirements
             } for product in products]
         if len(results) == 0:
@@ -266,6 +359,7 @@ def handle_products():
 @app.route('/products/<product_id>', methods=['GET', 'POST', 'DELETE'])
 def handle_product(product_id):
     product = ProductsModel.query.get_or_404(product_id)
+    bmpid = product.bmpid
 
     if request.method == 'GET':
         response = {
@@ -273,7 +367,6 @@ def handle_product(product_id):
             "bmpid": product.bmpid,
             "desc": product.desc,
             "customer": product.customer,
-            "lastqc": product.lastqc,
             "requirements": product.requirements
         }
         return {"message": "success", "product": response}
@@ -285,8 +378,8 @@ def handle_product(product_id):
         return{"POST": "POST THINGY"}
 
     elif request.method == 'DELETE':
-        qcRecords = ProductsModel.query.filter_by(id=product_id).first() #change this once qc table built
-        if (qcRecords): #change this to not qcRecords once QC table is built
+        qcRecords = LogsModel.query.filter_by(bmpid=bmpid).first() #change this once qc table built
+        if (qcRecords == None): #change this to not qcRecords once QC table is built
             db.session.delete(product)
             db.session.commit()
             flash("Product successfully deleted.")
@@ -356,16 +449,15 @@ def handle_customer(customer_id):
         return{"POST": "POST THINGY"}
 
     elif request.method == 'DELETE':
-        # qcRecords = QCModel.query.filter_by(customer=customer_name).first() #change this once qc table built
         productRecords = ProductsModel.query.filter_by(customer=customer_name).first()
         print(productRecords)
-        if (productRecords == None): #change this to not qcRecords once QC table is built
+        if (productRecords == None):
             db.session.delete(customer)
             db.session.commit()
             flash("Customer successfully deleted.")
             return {"Success": "Customer has been deleted."}
         else:
-            flash("Customer unable to be deleted since it has Product or QC records tied to it.")
+            flash("Customer unable to be deleted since it has Products tied to it.")
             return {"Success": "Customer not deleted."}
 
 '''
@@ -390,85 +482,7 @@ def handle_customer(customer_id):
 def api_home():
     return {"Hello" : "World"}
 
-
-@app.route('/api/products', methods=['GET', 'POST'])
-def handle_products_api():
-    if request.method == 'GET':
-        products = ProductsModel.query.all()
-        results = [
-            {
-                "id" : product.id,
-                "bmpid": product.bmpid,
-                "desc": product.desc,
-                "customer": product.customer,
-                "lastqc": product.lastqc,
-                "requirements": product.requirements
-            } for product in products]
-        return {"count": len(results), "products": results, "message": "success"}
-    elif request.method == 'POST':
-        if request.is_json:
-            data = request.get_json()
-            lastqc = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            requirements = data['requirements']
-            if not requirements:
-                requirements = "{\"None\" : \"N/A\"}"
-            new_product = ProductsModel(bmpid=data['bmpid'], desc=data['desc'], customer=data['customer'], lastqc=lastqc, requirements=requirements)
-            if not check_product_exists(new_product):
-                db.session.add(new_product)
-                db.session.commit()
-                return {"Success": f"Product: '{new_product.desc} | {new_product.bmpid}' has been created."}
-            else:
-                return {"Fail": f"BMP Product ID: '{new_product.bmpid}' already exists."}
-        else:
-            return {"API Error": "The request payload is not in JSON format"}
-
-
-@app.route('/api/products/<product_id>', methods=['GET', 'POST', 'DELETE'])
-def handle_product_api(product_id):
-    product = ProductsModel.query.get_or_404(product_id)
-
-    if request.method == 'GET':
-        response = {
-            "id" : product.id,
-            "bmpid": product.bmpid,
-            "desc": product.desc,
-            "customer": product.customer,
-            "lastqc": product.lastqc,
-            "requirements": product.requirements
-        }
-        return {"message": "success", "product": response}
-
-    elif request.method == 'POST':
-        data = request.get_json()
-        exists = False
-        if (product.bmpid != data['bmpid']):
-            exists = False
-            products = ProductsModel.query.all()
-            for product in products:
-                if (product.bmpid == data['bmpid']):
-                    exists = True
-
-        if exists:
-            exists = False
-            return {"Fail": f"Product not updated. BMP Product ID '{product.bmpid}' already exists."}
-        else:
-            product.bmpid = data['bmpid']
-            product.desc = data['desc']
-            product.customer = data['customer']
-            product.lastqc = data['lastqc']
-            product.requirements = data ['requirements']
-            db.session.add(product)
-            db.session.commit()
-            return {"Success": f"Product: '{product.desc} | {product.bmpid}' has been updated."}
-
-    elif request.method == 'DELETE':
-        qcRecords = ProductsModel.query.filter_by(id=product_id).first() #change this once qc table built
-        if (qcRecords): #change this to not qcRecords once QC table is built
-            db.session.delete(product)
-            db.session.commit()
-            return {"Success": f"Product: '{product.desc} | {product.bmpid}' successfully deleted."}
-        else:
-            return {"Fail": f"Product: '{product.desc} | {product.bmpid}' unable to be deleted since it has QC records tied to it."}
+# Removed API Logic on 11/28/2020 @ 9:52pm ET
 
 
 '''

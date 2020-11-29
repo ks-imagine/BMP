@@ -7,13 +7,13 @@
     All Customers
 </h1>
 <button id="add-customer-button" class="cursor-pointer">Add Customer +</button>
-<h3 style="color: green;">{{ status_good }}</h3>
-<h3 style="color: yellow;">{{ status_bad }}</h3>
+<h3 class="status good">{{ status_good }}</h3>
+<h3 class="status bad">{{ status_bad }}</h3>
 
 {% with messages = get_flashed_messages() %}
     {% if messages %}
     {% for message in messages %}
-    <h3 style="color: red;">
+    <h3 class="status fail">
         {{ message }}
     </h3>
     {% endfor %}
@@ -44,7 +44,7 @@
 <h3>
     <div class="center content" style="max-width: 75%; width: 100%;">
         <input type="text" id="customerSearch" onkeyup="searchTable('customerSearch', 'customerTable')" placeholder="Search..." title="Search customers...">
-        <table id="customerTable">
+        <table id="customerTable" class="bmp-table">
             <thead>
                 <tr>
                     <th onclick="sortTable(0, 'customerTable')"> ID# </th>

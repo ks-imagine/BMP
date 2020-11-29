@@ -1,0 +1,136 @@
+<!-- templates/logs.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title bmp-title">
+    All QC Logs
+</h1>
+<button id="add-log-button" class="cursor-pointer">Add QC Log +</button>
+<h3 class="status good">{{ status_good }}</h3>
+<h3 class="status bad">{{ status_bad }}</h3>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <h3 class="status fail">
+        {{ message }}
+    </h3>
+    {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+<div id="myModal" class="modal">
+    <div class="center content modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2>Add a QC Log</h2>
+        </div>
+        <div class="modal-body">
+            <form method="POST">
+                <p>
+                    <label for="bmpid">BMP Product Number &nbsp;&nbsp;&nbsp;</label>
+                    <select id="bmpid" name="bmpid">
+                        {% for bmpid in productResults %}
+                        <option value="{{ bmpid.bmpid }}">{{ bmpid.bmpid }}</option>
+                        {% endfor %}
+                    </select>
+                </p>
+                <p>
+                    <label for="requirements">Requirements</label>
+                    <input type="text" id="requirements" name="requirements" value="">
+                </p>
+                <div>
+                    <input type="submit" value="Submit" class="cursor-pointer">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<h3>
+    <div class="center content" style="max-width: 75%; width: 100%;">
+        <input type="text" id="logSearch" onkeyup="searchTable('logSearch', 'logTable')" placeholder="Search..." title="Search logs...">
+        <table id="logTable" class="bmp-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'logTable')"> Log ID# </th>
+                    <th onclick="sortTable(1, 'logTable')"> BMP ID# </th>
+                    <th onclick="sortTable(2, 'logTable')"> Product Description </th>
+                    <th onclick="sortTable(3, 'logTable')"> Last QC Record </th>
+                    <th onclick="sortTable(4, 'logTable')"> User </th>
+                    <th onclick="sortTable(5, 'logTable')"> Requirements </th>
+                    {% if current_user.is_authenticated %}
+                    <th style="cursor: initial;">Edit</th>
+                    <th style="cursor: initial;">Delete</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            {% for log in results %}
+            <tbody>
+                <tr>
+                    <td>{{ log.id }}</td>
+                    <td>{{ log.bmpid }}</td>
+                    <td>{{ log.desc }}</td>
+                    <td>{{ log.lastqc }}</td>
+                    <td>{{ log.user }}</td>
+                    <td class="reqs">{{ log.requirements}}</td>
+                    {% if current_user.is_authenticated %}
+                    <td><a onclick="editLog({{ log.id }})"><img src="../static/edit.png"></a></td>
+                    <td><a onclick="deleteLog({{ log.id }})"><img src="../static/trash.png"></a></td>
+                    {% endif %}
+                </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+        <h4>{{ no_logs }}</h4>
+    </div>
+</h3>
+<script>
+    var x = document.getElementsByClassName("reqs").length;
+    for (var i = 0; i < x; i++) {
+        var info = document.getElementsByClassName("reqs")[i].innerText.replace(/'/g, '"');
+        // console.log(info)
+        var obj = JSON.parse(info);
+        // console.log(obj);
+        document.getElementsByClassName("reqs")[i].innerHTML = ("");
+        var first = true;
+        for (var key in obj) {
+            if (!first) {
+                document.getElementsByClassName("reqs")[i].innerHTML += ("<br>");
+            } first = false;
+            var value = obj[key];
+            // console.log(key + ", " + value);
+            document.getElementsByClassName("reqs")[i].innerHTML += (key + " = " + value);
+        }
+    }
+</script>
+<script>
+    window.onload = function() {
+        // Get the modal
+        var modal = document.getElementById("myModal");
+        // Get the button that opens the modal
+        var logAddButton = document.getElementById("add-log-button");
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        logAddButton.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    };
+</script>
+{% endblock %}

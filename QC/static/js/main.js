@@ -26,16 +26,25 @@ function sortTable(n, tableName) {
       one from current row and one from the next:*/
       x = rows[i].getElementsByTagName("TD")[n];
       y = rows[i + 1].getElementsByTagName("TD")[n];
+      x_value = x.innerText.toLowerCase();
+      y_value = y.innerText.toLowerCase();
+
+      var xisnum = /^\d+$/.test(x_value);
+      var yisnum =/^\d+$/.test(y_value);
+      if (xisnum && yisnum) {
+        x_value = parseInt(x_value);
+        y_value = parseInt(y_value);
+      }
       /*check if the two rows should switch place,
         based on the direction, asc or desc:*/
       if (dir == "asc") {
-        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+        if (x_value > y_value) {
           //if so, mark as a switch and break the loop:
           shouldSwitch = true;
           break;
         }
       } else if (dir == "desc") {
-        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+        if (x_value < y_value) {
           //if so, mark as a switch and break the loop:
           shouldSwitch = true;
           break;
@@ -66,7 +75,7 @@ function searchTable(search, table) {
   filter = input.value.toUpperCase();
   table = document.getElementById(table);
   tr = table.getElementsByTagName("tr");
-  for (i = 0; i < tr.length; i++) {
+  for (i = 1; i < tr.length; i++) {
     (td = tr[i].getElementsByTagName("td")), (match = false);
     for (j = 0; j < td.length; j++) {
       if (td[j].innerHTML.toUpperCase().indexOf(filter) > -1) {
@@ -83,7 +92,9 @@ function searchTable(search, table) {
 }
 
 function deleteProduct(productID) {
-  fetch(`products/` + productID, { method: "DELETE" })
+  var confirmed = confirm("Are you sure you want to delete this entry?");
+  if (confirmed) {
+    fetch(`products/` + productID, { method: "DELETE" })
     .then((response) => {
       window.location.href = "/products";
     })
@@ -91,6 +102,7 @@ function deleteProduct(productID) {
       alert("Error Occured"); //MESSAGE
       window.location.href = "/products";
     });
+  }
 }
 
 function editProduct(productID) {
@@ -98,17 +110,18 @@ function editProduct(productID) {
     method: "POST"
   })
     .then((response) => {
-      // window.location.href = "/products";
+      window.location.href = "/products";
     })
     .catch((error) => {
       alert("Error Occured"); //MESSAGE
-      // window.location.href = "/products";
+      window.location.href = "/products";
     });
-    window.location.href = "/products";
 }
 
 function deleteCustomer(customerID) {
-  fetch(`customers/` + customerID, { method: "DELETE" })
+  var confirmed = confirm("Are you sure you want to delete this entry?");
+  if (confirmed) {
+    fetch(`customers/` + customerID, { method: "DELETE" })
     .then((response) => {
       window.location.href = "/customers";
     })
@@ -116,4 +129,19 @@ function deleteCustomer(customerID) {
       alert("Error Occured"); //MESSAGE
       window.location.href = "/customers";
     });
+  }
+}
+
+function deleteLog(logID) {
+  var confirmed = confirm("Are you sure you want to delete this entry?");
+  if (confirmed) {
+    fetch(`logs/` + logID, { method: "DELETE" })
+    .then((response) => {
+      window.location.href = "/logs";
+    })
+    .catch((error) => {
+      alert("Error Occured"); //MESSAGE
+      window.location.href = "/logs";
+    });
+  }
 }

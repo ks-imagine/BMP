@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="../static/css/main.css">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <script src="../static/js/main.js"></script>
-    <script src="../static/js/jquery-3.5.1.js"></script>
 </head>
 
 <body>
@@ -27,6 +26,9 @@
                                 Home
                             </a>
                             {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('handle_logs') }}" class="navbar-item">
+                                QC Logs
+                            </a>
                             <a href="{{ url_for('handle_products') }}" class="navbar-item">
                                 Products
                             </a>
@@ -57,6 +59,12 @@
             <div class="container has-text-centered">
                {% block content %}
                {% endblock %}
+            </div>
+        </div>
+        
+        <div class="hero-footer">
+            <div class="container has-text-centered footer-text">
+                Problems? Please email <a href="mailto:kevscaringi@gmail.com?subject=BMP%20QC%20Application%20Issues" target="_blank" style="text-decoration: underline;">Kevin Scaringi</a>.
             </div>
         </div>
     </section>

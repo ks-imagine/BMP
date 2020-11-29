@@ -2552,12 +2552,8 @@ a.box:active {
 .content table {
   width: 100%;
 }
-.content table td{
-  border-width: 0 0 1px;
-  padding: 0.5em 0.75em;
-  vertical-align: top;
-}
-.content table th {
+
+.content table th, .content table td {
   border: 1px solid #dbdbdb;
   border-width: 0 0 1px;
   padding: 0.5em 0.75em;
@@ -2576,10 +2572,6 @@ a.box:active {
 .content table tfoot th {
   border-width: 2px 0 0;
   color: #ffffff;
-}
-.content table tbody tr:last-child td,
-.content table tbody tr:last-child th {
-  border-bottom-width: 0;
 }
 .content.is-small {
   font-size: 0.75rem;
@@ -9221,6 +9213,9 @@ label.panel-block:hover {
   flex-shrink: 0;
   padding: 3rem 1.5rem;
 }
+.hero-footer {
+  padding: 10px 0px;
+}
 .section {
   padding: 3rem 1.5rem;
 }
@@ -9236,11 +9231,21 @@ label.panel-block:hover {
   background-color: #fafafa;
   padding: 3rem 1.5rem 6rem;
 }
+
+
+
+
+
+
 /* My New Styles */
 .center {
   margin: auto;
   width: 50%;
   padding: 10px;
+}
+
+.footer-text {
+  font-weight: bold;
 }
 
 .bmp-title {
@@ -9251,7 +9256,7 @@ label.panel-block:hover {
   cursor: pointer;
 }
 
-#productSearch, #customerSearch {
+#productSearch, #customerSearch, #logSearch {
   background-image: url("searchicon.png");
   background-position: 10px 12px;
   background-repeat: no-repeat;
@@ -9260,6 +9265,14 @@ label.panel-block:hover {
   padding: 12px 20px 12px 40px;
   border: 1px solid #ddd;
   margin-bottom: 12px;
+  border-radius: 25px;
+}
+
+.bmp-table {
+  background-color: rgba(105, 105, 105, 0.3);
+  border-collapse: separate;
+  border: solid white 1px;
+  border-radius: 6px;
 }
 
 .content form {
@@ -9308,6 +9321,9 @@ label.panel-block:hover {
   border-radius: 25px;
   background: dimgrey;
   background-image: url("../dark-sand.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   padding: 20px;
 }
 
@@ -9333,6 +9349,20 @@ label.panel-block:hover {
 
 .modal-body {
   padding: 2px 16px;
+}
+
+.status {
+  font-weight: bold;
+  padding-top: 5px;
+}
+.good {
+  color: green;
+}
+.bad {
+  color: yellow;
+}
+.fail {
+  color: red;
 }
 
 /* Add Animation */
