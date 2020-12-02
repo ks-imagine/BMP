@@ -2553,6 +2553,10 @@ a.box:active {
   width: 100%;
 }
 
+.content table th {
+  cursor: pointer;
+}
+
 .content table th, .content table td {
   border: 1px solid #dbdbdb;
   border-width: 0 0 1px;
@@ -2560,7 +2564,6 @@ a.box:active {
   vertical-align: top;
   color: #ffffff;
   text-align: left;
-  cursor: pointer;
   vertical-align: middle;
 }
 .content table thead td,
@@ -9291,6 +9294,10 @@ label.panel-block:hover {
   display: table-cell;
 }
 
+.hidden-search {
+  display: none;
+}
+
 /* Modal */
 .modal {
   display: none; /* Hidden by default */
@@ -9310,6 +9317,18 @@ label.panel-block:hover {
 }
 
 /* Modal Content */
+.modal-buttons {
+  display: inline-block;
+  padding: 3px 10px;
+  background: #fff;
+  border: 0 none;
+  cursor: pointer;
+  -webkit-border-radius: 25px;
+  border-radius: 25px;
+  color: #000;
+  font-size: 13px;
+}
+
 .modal-content {
   position: fixed;
   bottom: 50%;
@@ -9328,7 +9347,6 @@ label.panel-block:hover {
   padding: 20px;
 }
 
-/* The Close Button */
 .close {
   color: white;
   float: right;

@@ -37,7 +37,7 @@ migrate = Migrate(app, db)
 class UserModel(UserMixin, db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(1000))
@@ -219,14 +219,7 @@ def profile():
 @app.route('/logs', methods=['POST', 'GET'])
 @login_required
 def handle_logs():
-    products = ProductsModel.query.all()
-    productResults = [
-        {
-            "bmpid": product.bmpid,
-            "description": product.description,
-            "customer": product.customer,
-            "requirements": product.requirements
-        } for product in products]
+    productResults = query_products()
     if request.method == 'POST':
         bmpid = int(request.form.get("bmpid"))
         lastqc = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -239,29 +232,10 @@ def handle_logs():
         new_log = LogsModel(bmpid, lastqc, user, requirements)
         db.session.add(new_log)
         db.session.commit()
-        logs = db.session.query(LogsModel.id, LogsModel.bmpid, LogsModel.lastqc, LogsModel.user, LogsModel.requirements, ProductsModel.description).join(ProductsModel).order_by(desc('lastqc'))
-
-        results = [
-            {
-                "id" : log.id,
-                "bmpid": log.bmpid,
-                "lastqc": log.lastqc,
-                "user" : log.user,
-                "requirements": log.requirements,
-                "description": log.description
-            } for log in logs]
+        results = query_logs()
         return render_template('logs.html', results=results, productResults=productResults, status_good=f"Success! Log: '{new_log.id}' has been created.")
     elif request.method == 'GET':
-        logs = db.session.query(LogsModel.id, LogsModel.bmpid, LogsModel.lastqc, LogsModel.user, LogsModel.requirements, ProductsModel.description).join(ProductsModel).order_by(desc('lastqc'))
-        results = [
-            {
-                "id" : log.id,
-                "bmpid": log.bmpid,
-                "lastqc": log.lastqc,
-                "user" : log.user,
-                "requirements": log.requirements,
-                "description": log.description
-            } for log in logs]
+        results = query_logs()
         if len(results) == 0:
             return render_template('logs.html', productResults=productResults, no_logs="No Logs to Display")
         else:
@@ -270,14 +244,14 @@ def handle_logs():
 @app.route('/logs/<log_id>', methods=['GET', 'POST', 'DELETE'])
 def handle_log(log_id):
     log = LogsModel.query.get_or_404(log_id)
-    if request.method == 'GET':
-        response = {
+    response = {
             "id" : log.id,
             "bmpid": log.bmpid,
             "lastqc": log.lastqc,
             "user" : log.user,
             "requirements": log.requirements
         }
+    if request.method == 'GET':
         return {"message": "success", "product": response}
 
     elif request.method == 'POST':
@@ -288,7 +262,7 @@ def handle_log(log_id):
 
     elif request.method == 'DELETE':
         logDate = LogsModel.query.filter_by(id=log_id).first()
-        if (logDate.lastqc > (datetime.now() - timedelta(days=1))):
+        if (logDate.lastqc > (datetime.now() - timedelta(days=2))):
             db.session.delete(log)
             db.session.commit()
             flash("QC Log successfully deleted.")
@@ -302,12 +276,7 @@ def handle_log(log_id):
 @app.route('/products', methods=['POST', 'GET'])
 @login_required
 def handle_products():
-    customers = CustomersModel.query.all()
-    customerResults = [
-        {
-            "id" : customer.id,
-            "customer": customer.customer
-        } for customer in customers]
+    customerResults = query_customers()
     if request.method == 'POST':
         bmpid = int(request.form.get("bmpid"))
         description = request.form.get("description")
@@ -321,38 +290,14 @@ def handle_products():
         if not check_product_exists(new_product):
             db.session.add(new_product)
             db.session.commit()
-            products = ProductsModel.query.order_by(desc('bmpid'))
-            results = [
-                {
-                    "id" : product.id,
-                    "bmpid": product.bmpid,
-                    "description": product.description,
-                    "customer": product.customer,
-                    "requirements": product.requirements
-                } for product in products]
+            results = query_products()
             return render_template('products.html', results=results, customerResults=customerResults, status_good=f"Success! Product: '{new_product.description} | {new_product.bmpid}' has been created.")
         else:
-            products = ProductsModel.query.order_by(desc('bmpid'))
-            results = [
-                {
-                    "id" : product.id,
-                    "bmpid": product.bmpid,
-                    "description": product.description,
-                    "customer": product.customer,
-                    "requirements": product.requirements
-                } for product in products]
+            results = query_products()
             return render_template('products.html', results=results, customerResults=customerResults, status_bad=f"Fail...  BMP Product ID: '{new_product.bmpid}' already exists.")
 
     elif request.method == 'GET':
-        products = ProductsModel.query.order_by(desc('bmpid'))
-        results = [
-            {
-                "id" : product.id,
-                "bmpid": product.bmpid,
-                "description": product.description,
-                "customer": product.customer,
-                "requirements": product.requirements
-            } for product in products]
+        results = query_products()
         if len(results) == 0:
             return render_template('products.html', customerResults=customerResults, no_products="No Products to Display")
         else:
@@ -362,15 +307,15 @@ def handle_products():
 def handle_product(product_id):
     product = ProductsModel.query.get_or_404(product_id)
     bmpid = product.bmpid
-
-    if request.method == 'GET':
-        response = {
+    response = {
             "id" : product.id,
             "bmpid": product.bmpid,
             "description": product.description,
             "customer": product.customer,
             "requirements": product.requirements
         }
+
+    if request.method == 'GET':
         return {"message": "success", "product": response}
 
     elif request.method == 'POST':
@@ -403,29 +348,14 @@ def handle_customers():
         if not check_customer_exists(new_customer):
             db.session.add(new_customer)
             db.session.commit()
-            customers = CustomersModel.query.all()
-            results = [
-                {
-                    "id" : customer.id,
-                    "customer": customer.customer
-                } for customer in customers]
+            results = query_customers()
             return render_template('customers.html', results=results, status_good=f"Success! Customer: '{new_customer.customer} | {new_customer.id}' has been created.")
         else:
-            customers = CustomersModel.query.all()
-            results = [
-                {
-                    "id" : customer.id,
-                    "customer": customer.customer
-                } for customer in customers]
+            results = query_customers()
             return render_template('customers.html', results=results, status_bad=f"Fail...  Customer: '{new_customer.customer}' already exists.")
 
     elif request.method == 'GET':
-        customers = CustomersModel.query.all()
-        results = [
-            {
-                "id" : customer.id,
-                "customer": customer.customer
-            } for customer in customers]
+        results = query_customers()
         if len(results) == 0:
             return render_template('customers.html', no_customers="No Customers to Display")
         else:
@@ -435,12 +365,12 @@ def handle_customers():
 def handle_customer(customer_id):
     customer = CustomersModel.query.get_or_404(customer_id)
     customer_name = customer.customer
-
-    if request.method == 'GET':
-        response = {
+    response = {
             "id" : customer.id,
             "customer": customer.customer
         }
+
+    if request.method == 'GET':
         return {"message": "success", "customer": response}
 
     elif request.method == 'POST':
@@ -452,7 +382,6 @@ def handle_customer(customer_id):
 
     elif request.method == 'DELETE':
         productRecords = ProductsModel.query.filter_by(customer=customer_name).first()
-        print(productRecords)
         if (productRecords == None):
             db.session.delete(customer)
             db.session.commit()
@@ -520,6 +449,41 @@ def check_customer_exists(_customer):
         if (customer.customer == _customer.customer):
             exists = True
     return exists
+
+def query_logs():
+    logs = db.session.query(LogsModel.id, LogsModel.bmpid, LogsModel.lastqc, LogsModel.user, LogsModel.requirements, ProductsModel.description, ProductsModel.customer).join(ProductsModel).order_by(desc('lastqc'))
+    results = [
+        {
+            "id" : log.id,
+            "bmpid": log.bmpid,
+            "lastqc": log.lastqc,
+            "user" : log.user,
+            "requirements": log.requirements,
+            "description": log.description,
+            "customer": log.customer
+        } for log in logs]
+    return results
+
+def query_products():
+    products = ProductsModel.query.order_by(desc('bmpid'))
+    results = [
+        {
+            "id" : product.id,
+            "bmpid": product.bmpid,
+            "description": product.description,
+            "customer": product.customer,
+            "requirements": product.requirements
+        } for product in products]
+    return results
+
+def query_customers():
+    customers = CustomersModel.query.all()
+    results = [
+        {
+            "id" : customer.id,
+            "customer": customer.customer
+        } for customer in customers]
+    return results
 
 
 if __name__ == '__main__':
