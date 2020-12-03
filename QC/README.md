@@ -34,7 +34,7 @@ Kindly ensure you have the following installed:
 
     ```
     $ createuser --interactive --pwprompt
-    $ createdb qc
+    $ createdb bmp-qc
     ```
 
 4. Export the required environment variables:

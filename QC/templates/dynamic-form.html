@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table { width: 70%; }
+        table, th, td { border: solid 1px #DDD;
+            border-collapse: collapse; padding: 2px 3px; text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <p>
+        <input type="button" id="addRow" value="Add New Row" onclick="addRow()" />
+    </p>
+    <div id="cont">
+        <table id="empTable">
+            <tr>
+                <th></th>
+                <th>Requirements (Short)</th>
+                <th>Requirements (Long)</th>
+                <th>Value Type</th>
+                <th>Max</th>
+                <th>Min</th>
+            </tr>
+        </table>
+    </div>
+    <p><input type="button" id="bt" value="Submit Data" onclick="submit()" /></p>
+</body>
+
+<script>
+    // function to add new row.
+    function addRow() {
+        var empTab = document.getElementById('empTable');
+        var colCnt = empTab.rows[0].cells.length;
+        var rowCnt = empTab.rows.length;
+        var tr = empTab.insertRow(rowCnt);
+
+        for (i = 0; i < colCnt; i++) {
+            var td = document.createElement('td');
+            td = tr.insertCell(i);
+
+            if (i == 0) {   // if its the first column of the table.
+                // add a button control.
+                var button = document.createElement('input');
+
+                // set the attributes.
+                button.setAttribute('type', 'button');
+                button.setAttribute('value', 'Remove Row');
+
+                // add button's "onclick" event.
+                button.setAttribute('onclick', 'removeRow(this)');
+
+                td.appendChild(button);
+            }
+            else if (i == 3) {
+                var values = ["Pass/Fail", "Number", "String"];
+                var select = document.createElement("select");
+                select.name = "data-types";
+                select.id = "data-types" + rowCnt;
+                select.setAttribute('onchange', 'setDefaults(' + (rowCnt) +')');
+                for (const val of values) {
+                    var option = document.createElement("option");
+                    option.value = val;
+                    option.text = val;
+                    select.appendChild(option);
+                }
+                td.appendChild(select);
+            }
+            else if (i ==4) {
+                var ele = document.createElement('input');
+                ele.id =  "max" + rowCnt;
+                ele.setAttribute('type', 'text');
+                ele.setAttribute('value', 'Pass');
+                td.appendChild(ele);
+            }
+            else if (i == 5) {
+                var ele = document.createElement('input');
+                ele.id = "min" + rowCnt;
+                ele.setAttribute('type', 'text');
+                ele.setAttribute('value', 'Fail');
+                td.appendChild(ele);
+            }
+            else {
+                var ele = document.createElement('input');
+                ele.setAttribute('type', 'text');
+                td.appendChild(ele);
+            }
+        }
+    }
+
+    // function to delete a row.
+    function removeRow(oButton) {
+        var empTab = document.getElementById('empTable');
+        empTab.deleteRow(oButton.parentNode.parentNode.rowIndex);
+    }
+
+    // function to extract and submit table data.
+    function submit() {
+        var myTab = document.getElementById('empTable');
+        var arrValues = new Array();
+        // loop through each row of the table.
+        for (row = 1; row < myTab.rows.length; row ++) {
+            // loop through each cell in a row.
+            for (c = 0; c < myTab.rows[row].cells.length; c++) {
+                var element = myTab.rows.item(row).cells[c];
+                if (c != 0 && c != 3) {
+                    if (checkValues(element.childNodes[0].value)){
+                        arrValues.push(customTrim(element.childNodes[0].value));
+                    }
+                    else {
+                        arrValues.push("");
+                    }
+                } else if (c == 3) {
+                    var dd = document.getElementById("data-types" + row);
+                    var ddValues = dd.options[dd.selectedIndex].text;
+                    arrValues.push(ddValues);
+                }
+            }
+        }
+        console.log(arrValues);
+    }
+
+    function checkValues(string) {
+        const regex = RegExp('[a-zA-Z0-9]+');
+        return regex.test(string);
+    }
+
+    function customTrim(string) {
+        return string.replace(/^(\s|-|_)+|(\s|-|_)+$/gm,'');
+    }
+
+    function setDefaults(rowNum) {
+        var dd = document.getElementById("data-types" + rowNum);
+        var ddValues = dd.options[dd.selectedIndex].text;
+        if (ddValues == "Pass/Fail") {
+            document.getElementById("max" + rowNum).value = "Pass";
+            document.getElementById("min" + rowNum).value = "Fail";
+        } else if (ddValues == "Number") {
+            document.getElementById("max" + rowNum).value = "0";
+            document.getElementById("min" + rowNum).value = "1";
+        } else {
+            document.getElementById("max" + rowNum).value = "ABC";
+            document.getElementById("min" + rowNum).value = "XYZ";
+        }
+    }
+</script>
+</html>
