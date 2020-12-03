@@ -53,7 +53,7 @@
                 td.appendChild(button);
             }
             else if (i == 3) {
-                var values = ["Pass/Fail", "Number", "String"];
+                var values = ["Pass/Fail", "Number", "Text"];
                 var select = document.createElement("select");
                 select.name = "data-types";
                 select.id = "data-types" + rowCnt;
@@ -71,6 +71,7 @@
                 ele.id =  "max" + rowCnt;
                 ele.setAttribute('type', 'text');
                 ele.setAttribute('value', 'Pass');
+                ele.setAttribute("disabled", "true");
                 td.appendChild(ele);
             }
             else if (i == 5) {
@@ -78,6 +79,7 @@
                 ele.id = "min" + rowCnt;
                 ele.setAttribute('type', 'text');
                 ele.setAttribute('value', 'Fail');
+                ele.setAttribute("disabled", "true");
                 td.appendChild(ele);
             }
             else {
@@ -132,15 +134,23 @@
     function setDefaults(rowNum) {
         var dd = document.getElementById("data-types" + rowNum);
         var ddValues = dd.options[dd.selectedIndex].text;
+        var max = document.getElementById("max" + rowNum);
+        var min = document.getElementById("min" + rowNum);
         if (ddValues == "Pass/Fail") {
-            document.getElementById("max" + rowNum).value = "Pass";
-            document.getElementById("min" + rowNum).value = "Fail";
+            max.value = "Pass";
+            min.value = "Fail";
+            max.setAttribute("disabled", "true");
+            min.setAttribute("disabled", "true");
         } else if (ddValues == "Number") {
-            document.getElementById("max" + rowNum).value = "0";
-            document.getElementById("min" + rowNum).value = "1";
+            max.value = "0";
+            min.value = "1";
+            max.removeAttribute("disabled");
+            min.removeAttribute("disabled");
         } else {
-            document.getElementById("max" + rowNum).value = "ABC";
-            document.getElementById("min" + rowNum).value = "XYZ";
+            max.value = "ABC";
+            min.value = "XYZ";
+            max.removeAttribute("disabled");
+            min.removeAttribute("disabled");
         }
     }
 </script>

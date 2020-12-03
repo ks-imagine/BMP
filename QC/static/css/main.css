@@ -9298,11 +9298,15 @@ label.panel-block:hover {
   display: none;
 }
 
+.max-min {
+  width: 80px;
+}
+
 /* Modal */
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  z-index: 50; /* Sit on top */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -9370,6 +9374,11 @@ label.panel-block:hover {
   padding: 2px 16px;
 }
 
+.bmp-submit {
+  margin-top: 5px;
+  font-size: 15px;
+}
+
 .status {
   font-weight: bold;
   padding-top: 5px;
@@ -9382,6 +9391,10 @@ label.panel-block:hover {
 }
 .fail {
   color: red;
+}
+
+.build-req {
+  margin-left: 10px;
 }
 
 /* Add Animation */

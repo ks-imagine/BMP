@@ -20,9 +20,8 @@
     {% endif %}
 {% endwith %}
 
-
 <div id="myModal" class="modal">
-    <div class="center content modal-content">
+    <div class="center content modal-content" id="modal-content">
         <div class="modal-header">
             <span class="close">&times;</span>
             <h2>Add a Product</h2>
@@ -35,7 +34,7 @@
                 </p>
                 <p>
                     <label for="description">Product Description</label>
-                    <input type="text" id="description" name="description" value="Doe">
+                    <input type="text" id="description" name="description" value="Some Product">
                 </p>
                 <p>
                     <label for="customer">Customer</label>
@@ -47,12 +46,32 @@
                 </p>
                 <p>
                     <label for="requirements">Requirements</label>
-                    <input type="text" id="requirements" name="requirements" value="">
+                    <input type="text" id="requirements" name="requirements" disabled>
+                    <span id="requirements-final" style="display:none;"></span>
+                    <span id="req-button" class="modal-buttons build-req" onclick="launchReqBuilder()">Build Requirements</span>
                 </p>
                 <div>
-                    <input type="submit" value="Submit" class="modal-buttons">
+                    <input type="submit" value="Submit" class="modal-buttons bmp-submit">
                 </div>
             </form>
+            <!-- Req Table -->
+            <div id="req-table" style="display:none;">
+                <hr style="height:3px;">
+                <input type="button" id="addRow" value="Add New Row" class="modal-buttons" onclick="addRow()" />
+                <div id="cont">
+                    <table id="empTable">
+                        <tr>
+                            <th></th>
+                            <th>Requirements (Short)</th>
+                            <th>Requirements (Long)</th>
+                            <th>Value Type</th>
+                            <th>Max</th>
+                            <th>Min</th>
+                        </tr>
+                    </table>
+                </div>
+                <input type="button" id="bt" value="Submit Requirements" class="modal-buttons" onclick="submit()" style="margin-top: 10px;"/>
+            </div>
         </div>
     </div>
 </div>
@@ -111,12 +130,11 @@
 </script>
 <script>
     window.onload = function() {
-        // Get the modal
         var modal = document.getElementById("myModal");
-        // Get the button that opens the modal
         var productAddButton = document.getElementById("add-product-button");
-        // Get the <span> element that closes the modal
         var span = document.getElementsByClassName("close")[0];
+        var reqTable = document.getElementById("req-table");
+        var modalContent = document.getElementById("modal-content");
 
         // When the user clicks the button, open the modal
         productAddButton.onclick = function () {
@@ -126,12 +144,18 @@
         // When the user clicks on <span> (x), close the modal
         span.onclick = function () {
             modal.style.display = "none";
+            reqTable.style.display = "none";
+            modalContent.style.top = "initial";
+            modalContent.style.bottom = "50%";
         }
 
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function (event) {
             if (event.target == modal) {
                 modal.style.display = "none";
+                reqTable.style.display = "none";
+                modalContent.style.top = "initial";
+                modalContent.style.bottom = "50%";
             }
         }
     };

@@ -145,3 +145,179 @@ function deleteLog(logID) {
     });
   }
 }
+
+/* Product Requirements Builder */
+function addRow() {
+  var empTab = document.getElementById('empTable');
+  var colCnt = empTab.rows[0].cells.length;
+  var rowCnt = empTab.rows.length;
+  var tr = empTab.insertRow(rowCnt);
+
+  for (i = 0; i < colCnt; i++) {
+      var td = document.createElement('td');
+      td = tr.insertCell(i);
+
+      if (i == 0) {
+          var button = document.createElement('input');
+          button.setAttribute('type', 'button');
+          button.setAttribute('value', 'Remove Row');
+          button.setAttribute('onclick', 'removeRow(this)');
+          button.className= "modal-buttons";
+          td.appendChild(button);
+      }
+      else if (i == 3) {
+          var values = ["Pass/Fail", "Number", "Text"];
+          var select = document.createElement("select");
+          select.name = "data-types";
+          select.id = "data-types" + rowCnt;
+          select.setAttribute('onchange', 'setDefaults(' + (rowCnt) +')');
+          for (const val of values) {
+              var option = document.createElement("option");
+              option.value = val;
+              option.text = val;
+              select.appendChild(option);
+          }
+          td.appendChild(select);
+      }
+      else if (i ==4) {
+          var ele = document.createElement('input');
+          ele.id =  "max" + rowCnt;
+          ele.className = "max-min";
+          ele.setAttribute('type', 'text');
+          ele.setAttribute('value', 'Pass');
+          ele.setAttribute("disabled", "true");
+          td.appendChild(ele);
+      }
+      else if (i == 5) {
+          var ele = document.createElement('input');
+          ele.id = "min" + rowCnt;
+          ele.className = "max-min";
+          ele.setAttribute('type', 'text');
+          ele.setAttribute('value', 'Fail');
+          ele.setAttribute("disabled", "true");
+          td.appendChild(ele);
+      }
+      else {
+          var ele = document.createElement('input');
+          ele.setAttribute('type', 'text');
+          td.appendChild(ele);
+      }
+  }
+}
+
+// function to delete a row.
+function removeRow(oButton) {
+  var empTab = document.getElementById('empTable');
+  empTab.deleteRow(oButton.parentNode.parentNode.rowIndex);
+}
+
+// function to extract and submit table data.
+function submit() {
+  var myTab = document.getElementById('empTable');
+  var arrValues = new Array();
+  var reqInput = document.getElementById("requirements");
+  var reqFinal = document.getElementById("requirements-final");
+  var reqButton = document.getElementById("req-button");
+  // loop through each row of the table.
+  for (row = 1; row < myTab.rows.length; row ++) {
+      // loop through each cell in a row.
+      for (c = 0; c < myTab.rows[row].cells.length; c++) {
+          var element = myTab.rows.item(row).cells[c];
+          if (c != 0) {
+              if (checkValues(element.childNodes[0].value)){
+                  arrValues.push(customTrim(element.childNodes[0].value));
+              }
+              else {
+                  arrValues.push("");
+              }
+          }
+      }
+  }
+
+  var finalRequirements = parseRequirements(arrValues);
+
+  if (arrValues.length > 0) {
+    reqInput.removeAttribute("disabled");
+    reqInput.value = finalRequirements;
+    reqInput.style.display = "none";
+
+    reqFinal.innerHTML = finalRequirements;
+    reqFinal.style.display = "block";
+    reqButton.innerHTML = "Edit Requirements";
+    launchReqBuilder();
+  } else {
+    reqInput.setAttribute("disabled", "true");
+    reqInput.value = "";
+    reqInput.style.display = "initial";
+
+    reqFinal.innerHTML = "";
+    reqFinal.style.display = "none";
+    reqButton.innerHTML = "Build Requirements";
+    launchReqBuilder();
+  }
+}
+
+function checkValues(string) {
+  const regex = RegExp('[a-zA-Z0-9]+');
+  return regex.test(string);
+}
+
+function customTrim(string) {
+  return string.replace(/^(\s|-|_)+|(\s|-|_)+$/gm,'');
+}
+
+function setDefaults(rowNum) {
+  var dd = document.getElementById("data-types" + rowNum);
+  var ddValues = dd.options[dd.selectedIndex].text;
+  var max = document.getElementById("max" + rowNum);
+  var min = document.getElementById("min" + rowNum);
+  if (ddValues == "Pass/Fail") {
+      max.value = "Pass";
+      min.value = "Fail";
+      max.setAttribute("disabled", "true");
+      min.setAttribute("disabled", "true");
+  } else if (ddValues == "Number") {
+      max.value = "0";
+      min.value = "1";
+      max.removeAttribute("disabled");
+      min.removeAttribute("disabled");
+  } else {
+      max.value = "ABC";
+      min.value = "XYZ";
+      max.removeAttribute("disabled");
+      min.removeAttribute("disabled");
+  }
+}
+
+function launchReqBuilder() {
+  var reqTable = document.getElementById("req-table");
+  var modalContent = document.getElementById("modal-content");
+  if (reqTable.style.display === "none") {
+    reqTable.style.display = "block";
+    modalContent.style.top = "0%";
+    modalContent.style.bottom = "0%";
+  } else {
+    reqTable.style.display = "none";
+    modalContent.style.top = "initial";
+    modalContent.style.bottom = "50%";
+  }
+}
+
+function parseRequirements(arrValues) {
+  var finalRequirements = "{'reqs': [ { ";
+  var keys = ["s-req", "l-req", "v-typ", "max", "min"];
+  var keyIndex = 0;
+  for (var i = 0; i < arrValues.length; i++) {
+    if (keyIndex == 4 && i != arrValues.length - 1) {
+      finalRequirements += "'" + keys[keyIndex] + "' : '" + arrValues[i] + "'}, { ";
+      keyIndex = 0;
+    } else if (i == arrValues.length - 1) {
+      finalRequirements += "'" + keys[keyIndex] + "' : '" + arrValues[i] + "'} ] }";
+    } else {
+      finalRequirements += "'" + keys[keyIndex] + "' : '" + arrValues[i] + "', ";
+      keyIndex++;
+    }
+  }
+  finalRequirements = finalRequirements.replaceAll("'", "\"");
+  return finalRequirements;
+}
