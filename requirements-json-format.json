@@ -1,0 +1,59 @@
+{
+    "reqs": [
+        {
+            "s-req" : "something",
+            "l-req" : "full description of the req",
+            "v-typ" : "pass/fail, number, text",
+            "max" : "max value / pass",
+            "min" : "min value / fail"
+        },
+        {
+            "s-req" : "something",
+            "l-req" : "full description of the req",
+            "v-typ" : "pass/fail, number, text",
+            "max" : "max value / pass",
+            "min" : "min value / fail"
+        },
+        {
+            "s-req" : "something",
+            "l-req" : "full description of the req",
+            "v-typ" : "pass/fail, number, text",
+            "max" : "max value / pass",
+            "min" : "min value / fail"
+        },
+        {
+            "s-req" : "something",
+            "l-req" : "full description of the req",
+            "v-typ" : "pass/fail, number, text",
+            "max" : "max value / pass",
+            "min" : "min value / fail"
+        },
+        {
+            "s-req" : "something",
+            "l-req" : "full description of the req",
+            "v-typ" : "pass/fail, number, text",
+            "max" : "max value / pass",
+            "min" : "min value / fail"
+        }
+    ]
+}
+
+
+{
+    "reqs": [
+        {
+            "s-req" : "short1",
+            "l-req" : "long1",
+            "v-typ" : "Pass/Fail",
+            "max" : "Pass",
+            "min" : "Fail"
+        },
+        {
+            "s-req" : "short2",
+            "l-req" : "long2",
+            "v-typ" : "Pass/Fail",
+            "max" : "Pass",
+            "min" : "Fail"
+        }
+    ]
+}
