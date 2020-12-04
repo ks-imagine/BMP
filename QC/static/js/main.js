@@ -237,18 +237,14 @@ function submit() {
   var finalRequirements = parseRequirements(arrValues);
 
   if (arrValues.length > 0) {
-    reqInput.removeAttribute("disabled");
     reqInput.value = finalRequirements;
-    reqInput.style.display = "none";
 
     reqFinal.innerHTML = finalRequirements;
     reqFinal.style.display = "block";
     reqButton.innerHTML = "Edit Requirements";
     launchReqBuilder();
   } else {
-    reqInput.setAttribute("disabled", "true");
     reqInput.value = "";
-    reqInput.style.display = "initial";
 
     reqFinal.innerHTML = "";
     reqFinal.style.display = "none";
@@ -291,7 +287,7 @@ function setDefaults(rowNum) {
 
 function launchReqBuilder() {
   var reqTable = document.getElementById("req-table");
-  var modalContent = document.getElementById("modal-content");
+  var modalContent = document.getElementById("product-modal-content");
   if (reqTable.style.display === "none") {
     reqTable.style.display = "block";
     modalContent.style.top = "0%";
@@ -304,20 +300,21 @@ function launchReqBuilder() {
 }
 
 function parseRequirements(arrValues) {
-  var finalRequirements = "{'reqs': [ { ";
-  var keys = ["s-req", "l-req", "v-typ", "max", "min"];
   var keyIndex = 0;
-  for (var i = 0; i < arrValues.length; i++) {
-    if (keyIndex == 4 && i != arrValues.length - 1) {
-      finalRequirements += "'" + keys[keyIndex] + "' : '" + arrValues[i] + "'}, { ";
+  const data = {
+    reqs: [],
+  };
+  const values = arrValues;
+  const keys = ["s-req", "l-req", "v-typ", "max", "min"];
+  for (var i = 0; i < values.length; i++) {
+    var obj = {};
+    obj[keys[keyIndex]] = values[i];
+    data.reqs.push(obj);
+    keyIndex++;
+    if (keyIndex == 5) {
       keyIndex = 0;
-    } else if (i == arrValues.length - 1) {
-      finalRequirements += "'" + keys[keyIndex] + "' : '" + arrValues[i] + "'} ] }";
-    } else {
-      finalRequirements += "'" + keys[keyIndex] + "' : '" + arrValues[i] + "', ";
-      keyIndex++;
     }
   }
-  finalRequirements = finalRequirements.replaceAll("'", "\"");
-  return finalRequirements;
+  console.log(JSON.stringify(data));
+  return JSON.stringify(data);
 }

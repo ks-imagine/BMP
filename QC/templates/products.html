@@ -20,8 +20,8 @@
     {% endif %}
 {% endwith %}
 
-<div id="myModal" class="modal">
-    <div class="center content modal-content" id="modal-content">
+<div id="product-modal" class="modal">
+    <div class="center content modal-content" id="product-modal-content">
         <div class="modal-header">
             <span class="close">&times;</span>
             <h2>Add a Product</h2>
@@ -46,7 +46,7 @@
                 </p>
                 <p>
                     <label for="requirements">Requirements</label>
-                    <input type="text" id="requirements" name="requirements" disabled>
+                    <input type="text" id="requirements" name="requirements" style="display:none;">
                     <span id="requirements-final" style="display:none;"></span>
                     <span id="req-button" class="modal-buttons build-req" onclick="launchReqBuilder()">Build Requirements</span>
                 </p>
@@ -98,7 +98,7 @@
                 <td>{{ product.description }}</td>
                 <td>{{ product.customer }}</td>
                 <!-- <td>{{ product.lastqc }}</td> -->
-                <td class="reqs">{{ product.requirements}}</td>
+                <td class="reqs"><a href="products/{{ product.id }}">Click to View Requirements</a></td>
                 {% if current_user.is_authenticated %}
                 <td><a onclick="editProduct({{ product.id }})"><img src="../static/edit.png"></a></td>
                 <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/trash.png"></a></td>
@@ -130,20 +130,20 @@
 </script>
 <script>
     window.onload = function() {
-        var modal = document.getElementById("myModal");
+        var productModal = document.getElementById("product-modal");
         var productAddButton = document.getElementById("add-product-button");
-        var span = document.getElementsByClassName("close")[0];
+        var close1 = document.getElementsByClassName("close")[0];
         var reqTable = document.getElementById("req-table");
-        var modalContent = document.getElementById("modal-content");
+        var modalContent = document.getElementById("product-modal-content");
 
         // When the user clicks the button, open the modal
         productAddButton.onclick = function () {
-            modal.style.display = "block";
+            productModal.style.display = "block";
         }
 
         // When the user clicks on <span> (x), close the modal
-        span.onclick = function () {
-            modal.style.display = "none";
+        close1.onclick = function () {
+            productModal.style.display = "none";
             reqTable.style.display = "none";
             modalContent.style.top = "initial";
             modalContent.style.bottom = "50%";
@@ -151,8 +151,8 @@
 
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function (event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
+            if (event.target == productModal) {
+                productModal.style.display = "none";
                 reqTable.style.display = "none";
                 modalContent.style.top = "initial";
                 modalContent.style.bottom = "50%";

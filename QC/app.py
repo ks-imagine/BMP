@@ -486,5 +486,24 @@ def query_customers():
     return results
 
 
+### THESE ARE DOG SHIT DELETE THEM AND BURN YOUR EYES OUT ###
+def query_requirements():
+    products = ProductsModel.query.order_by(desc('bmpid'))
+    parsedRequirements = [
+    {
+        "id" : requirement.id,
+        "reqs" : parse_requirements(requirement.requirements)
+    } for requirement in products]
+    return parsedRequirements
+
+def parse_requirements(requirement):
+    reqLength = len(requirement["reqs"])
+    parsedRequirement = ""
+    while reqLength > 0:
+        parsedRequirement += "Description (Short): " + requirement["reqs"][reqLength - 1]["s-req"] + " Description (Long): " + requirement["reqs"][reqLength - 1]["l-req"] + " Value Type: " + requirement["reqs"][reqLength - 1]["v-typ"] + " Maximum Value: " + requirement["reqs"][reqLength - 1]["max"] + " Minimum Value: " + requirement["reqs"][reqLength - 1]["min"]
+        reqLength -= 1
+    return parsedRequirement
+### END DOG SHIT ###
+
 if __name__ == '__main__':
     app.run(debug=True)
