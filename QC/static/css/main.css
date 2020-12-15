@@ -2570,6 +2570,7 @@ a.box:active {
 .content table thead th {
   border-width: 0 0 2px;
   color: #ffffff;
+  font-size: 18px;
 }
 .content table tfoot td,
 .content table tfoot th {

@@ -1,0 +1,41 @@
+<!-- templates/customer.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title bmp-title">
+    {{ customer_info.customer }}
+</h1>
+
+<div class="center content" style="max-width: 75%; width: 100%;">
+    <div>
+        <h2>Products</h2>
+        <input type="text" id="customerSearch" onkeyup="searchTable('customerSearch', 'customerTable')" placeholder="Search..." title="Search products...">
+        <table id="customerTable" class="bmp-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'customerTable')"> BMP ID# </th>
+                    <th onclick="sortTable(1, 'customerTable')"> Product Description </th>
+                    <!-- <th onclick="sortTable(2, 'customerTable')"> Last QC Record </th> -->
+                    <th onclick="sortTable(2, 'customerTable')"> Requirements </th>
+                </tr>
+            </thead>
+            {% for product in productResults %}
+            <tbody>
+                <tr>
+                    <td>{{ product.bmpid }}</td>
+                    <td>{{ product.description }}</td>
+                    <!-- <td>{{ product.lastqc }}</td> -->
+                    <td><a href="products/{{ product.id }}">Click to View Requirements</a></td>
+                </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+        <h4>{{ no_products }}</h4>
+    </div>
+    <div>
+        <h2>QC Logs</h2>
+    </div>
+</div>
+
+{% endblock %}

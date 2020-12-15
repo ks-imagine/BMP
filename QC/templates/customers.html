@@ -48,6 +48,8 @@
             <tr>
                 <th onclick="sortTable(0, 'customerTable')"> ID# </th>
                 <th onclick="sortTable(1, 'customerTable')"> Customer Name </th>
+                <th onclick="sortTable(2, 'customerTable')"> Product QTY </th>
+                <th onclick="sortTable(3, 'customerTable')"> Last QC </th>
                 {% if current_user.is_authenticated %}
                 <th style="cursor: initial;">Edit</th>
                 <th style="cursor: initial;">Delete</th>
@@ -58,9 +60,11 @@
         <tbody>
             <tr>
                 <td>{{ customer.id }}</td>
-                <td>{{ customer.customer }}</td>
+                <td id="cust{{ customer.id }}"><a href="customers/{{ customer.id }}">{{ customer.customer }}</a></td>
                 {% if current_user.is_authenticated %}
-                <td><a onclick="editCustomer({{ customer.id }})"><img src="../static/edit.png"></a></td>
+                <td>123</td>
+                <td>Last Night</td>
+                <td><a onclick="editCustomer({{ customer.id }}, '{{ customer.customer }}')"><img src="../static/edit.png"></a></td>
                 <td><a onclick="deleteCustomer({{ customer.id }})"><img src="../static/trash.png"></a></td>
                 {% endif %}
             </tr>

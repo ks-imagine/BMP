@@ -98,7 +98,7 @@
                 <td>{{ product.description }}</td>
                 <td>{{ product.customer }}</td>
                 <!-- <td>{{ product.lastqc }}</td> -->
-                <td class="reqs"><a href="products/{{ product.id }}">Click to View Requirements</a></td>
+                <td><a href="products/{{ product.id }}">Click to View Requirements</a></td>
                 {% if current_user.is_authenticated %}
                 <td><a onclick="editProduct({{ product.id }})"><img src="../static/edit.png"></a></td>
                 <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/trash.png"></a></td>
@@ -109,25 +109,6 @@
     </table>
     <h4>{{ no_products }}</h4>
 </div>
-<script>
-    var x = document.getElementsByClassName("reqs").length;
-    for (var i = 0; i < x; i++) {
-        var info = document.getElementsByClassName("reqs")[i].innerText.replace(/'/g, '"');
-        // console.log(info)
-        var obj = JSON.parse(info);
-        // console.log(obj);
-        document.getElementsByClassName("reqs")[i].innerHTML = ("");
-        var first = true;
-        for (var key in obj) {
-            if (!first) {
-                document.getElementsByClassName("reqs")[i].innerHTML += ("<br>");
-            } first = false;
-            var value = obj[key];
-            // console.log(key + ", " + value);
-            document.getElementsByClassName("reqs")[i].innerHTML += (key + " = " + value);
-        }
-    }
-</script>
 <script>
     window.onload = function() {
         var productModal = document.getElementById("product-modal");

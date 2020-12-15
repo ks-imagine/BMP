@@ -365,13 +365,22 @@ def handle_customers():
 def handle_customer(customer_id):
     customer = CustomersModel.query.get_or_404(customer_id)
     customer_name = customer.customer
-    response = {
+    customer_info = {
             "id" : customer.id,
             "customer": customer.customer
         }
+    productRecords = ProductsModel.query.filter_by(customer=customer_name)
+    productResults = [
+        {
+        "id" : product.id,
+        "bmpid": product.bmpid,
+        "description": product.description,
+        "customer": product.customer,
+        "requirements": product.requirements
+        } for product in productRecords]
 
     if request.method == 'GET':
-        return {"message": "success", "customer": response}
+        return render_template('customer.html', customer_info=customer_info, productResults=productResults)
 
     elif request.method == 'POST':
         # This will update the customer name in the customers table.
@@ -381,7 +390,6 @@ def handle_customer(customer_id):
         return{"POST": "POST THINGY"}
 
     elif request.method == 'DELETE':
-        productRecords = ProductsModel.query.filter_by(customer=customer_name).first()
         if (productRecords == None):
             db.session.delete(customer)
             db.session.commit()

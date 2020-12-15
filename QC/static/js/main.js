@@ -118,6 +118,29 @@ function editProduct(productID) {
     });
 }
 
+function editCustomer(customerID, customerName) {
+  var custRow = document.getElementById('cust'+customerID);
+  custRow.innerHTML = "";
+  var input = document.createElement("input");
+  input.type = "text";
+  input.id, input.name = "customer";
+  input.value = customerName;
+  custRow.appendChild(input);
+}
+
+function editCustomerSubmit(customerID, newCustomerName) {
+  fetch(`customers/` + customerID, {
+    method: "POST"
+  })
+    .then((response) => {
+      window.location.href = "/customers";
+    })
+    .catch((error) => {
+      alert("Error Occured"); //MESSAGE
+      window.location.href = "/customers";
+    });
+}
+
 function deleteCustomer(customerID) {
   var confirmed = confirm("Are you sure you want to delete this entry?");
   if (confirmed) {
@@ -273,8 +296,8 @@ function setDefaults(rowNum) {
       max.setAttribute("disabled", "true");
       min.setAttribute("disabled", "true");
   } else if (ddValues == "Number") {
-      max.value = "0";
-      min.value = "1";
+      max.value = "1";
+      min.value = "0";
       max.removeAttribute("disabled");
       min.removeAttribute("disabled");
   } else {
