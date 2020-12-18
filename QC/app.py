@@ -378,9 +378,21 @@ def handle_customer(customer_id):
         "customer": product.customer,
         "requirements": product.requirements
         } for product in productRecords]
-
+    logRecords = LogsModel.query.filter_by(bmpid=12345) #Edit this.. Learn to serach by foreign key
+    logResults = [
+        {
+        "id": log.id,
+        "bmpid" : log.bmpid,
+        "lastqc" : log.lastqc,
+        "user" : log.user
+        } for log in logRecords]
     if request.method == 'GET':
-        return render_template('customer.html', customer_info=customer_info, productResults=productResults)
+        if len(productResults) == 0:
+            return render_template('customer.html', customer_info=customer_info, no_products="No Products to Display", no_logs="No QC Logs to Display")
+        elif len(logResults) == 0:
+            return render_template('customer.html', customer_info=customer_info, productResults=productResults, no_logs="No QC Logs to Display")
+        else:
+            return render_template('customer.html', customer_info=customer_info, productResults=productResults, logResults=logResults)
 
     elif request.method == 'POST':
         # This will update the customer name in the customers table.

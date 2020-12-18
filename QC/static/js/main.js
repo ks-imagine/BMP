@@ -118,19 +118,29 @@ function editProduct(productID) {
     });
 }
 
-function editCustomer(customerID, customerName) {
+function editCustomer(customerID) {
   var custRow = document.getElementById('cust'+customerID);
+  var customerName = custRow.innerText;
   custRow.innerHTML = "";
   var input = document.createElement("input");
   input.type = "text";
-  input.id, input.name = "customer";
+  input.name = "customer";
+  input.className = "editCustomerInput"
   input.value = customerName;
   custRow.appendChild(input);
+
+  var img = document.createElement("img");
+  img.src = "http://127.0.0.1:5000/static/css/check-mark.png";
+  img.className = "invert-color";
+  img.id = "submitEditIcon";
+  custRow.appendChild(img);
 }
 
 function editCustomerSubmit(customerID, newCustomerName) {
+  var updatedCust = {"id" : customerID, "name" : newCustomerName};
   fetch(`customers/` + customerID, {
-    method: "POST"
+    method: "POST",
+    body: updatedCust
   })
     .then((response) => {
       window.location.href = "/customers";

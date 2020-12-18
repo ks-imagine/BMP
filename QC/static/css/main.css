@@ -9273,6 +9273,22 @@ label.panel-block:hover {
   border-radius: 25px;
 }
 
+.editCustomerInput {
+  border: 1px solid #ddd;
+  padding-left: 10px;
+  border-radius: 25px;
+}
+
+.invert-color {
+  -webkit-filter: invert(1);
+  filter: invert(1);
+}
+
+#submitEditIcon {
+  padding-left: 5px;
+  vertical-align: bottom;
+}
+
 .bmp-table {
   background-color: rgba(105, 105, 105, 0.3);
   border-collapse: separate;
@@ -9385,13 +9401,13 @@ label.panel-block:hover {
   padding-top: 5px;
 }
 .good {
-  color: green;
+  color: green !important;
 }
 .bad {
-  color: yellow;
+  color: yellow !important;
 }
 .fail {
-  color: red;
+  color: red !important;
 }
 
 .build-req {
