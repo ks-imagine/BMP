@@ -100,8 +100,8 @@
                 <!-- <td>{{ product.lastqc }}</td> -->
                 <td><a href="products/{{ product.id }}">Click to View Requirements</a></td>
                 {% if current_user.is_authenticated %}
-                <td><a onclick="editProduct({{ product.id }})"><img src="../static/edit.png"></a></td>
-                <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/trash.png"></a></td>
+                <td><a onclick="editProduct({{ product.id }})"><img src="../static/img/edit.png"></a></td>
+                <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/img/trash.png"></a></td>
                 {% endif %}
             </tr>
         </tbody>

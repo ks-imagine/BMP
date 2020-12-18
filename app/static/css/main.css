@@ -8657,7 +8657,7 @@ label.panel-block:hover {
 }
 .hero.is-primary {
   background-color: #252525;
-  background-image: url("../background.jpg");
+  background-image: url("../img/background.jpg");
   height: 100%;
   background-position: center;
   background-size: cover;
@@ -9361,7 +9361,7 @@ label.panel-block:hover {
   animation-duration: 0.4s;
   border-radius: 25px;
   background: dimgrey;
-  background-image: url("../dark-sand.jpg");
+  background-image: url("../img/dark-sand.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

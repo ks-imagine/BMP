@@ -76,8 +76,8 @@
                 <td>{{ log.lastqc }}</td>
                 <td>{{ log.user }}</td>
                 {% if current_user.is_authenticated %}
-                <td><a onclick="editLog({{ log.id }})"><img src="../static/edit.png"></a></td>
-                <td><a onclick="deleteLog({{ log.id }})"><img src="../static/trash.png"></a></td>
+                <td><a onclick="editLog({{ log.id }})"><img src="../static/img/edit.png"></a></td>
+                <td><a onclick="deleteLog({{ log.id }})"><img src="../static/img/trash.png"></a></td>
                 {% endif %}
             </tr>
         </tbody>
