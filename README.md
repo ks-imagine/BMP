@@ -19,7 +19,7 @@ Kindly ensure you have the following installed:
 
     ```
     $ git clone https://github.com/ks-imagine/BMP.git
-    $ cd QC
+    $ cd app
     ```
 
 2. With Python 3.6 and Pip installed:
