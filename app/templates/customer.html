@@ -6,8 +6,8 @@
 <h1 class="title bmp-title">
     {{ customer_info.customer }}
 </h1>
-
 <div class="center content" style="max-width: 75%; width: 100%;">
+    <hr>
     <div>
         <h2>Products</h2>
         <input type="text" id="productSearch" onkeyup="searchTable('productSearch', 'customerProductTable')" placeholder="Search..." title="Search products...">
@@ -34,6 +34,7 @@
         </table>
         <h4 class="status bad">{{ no_products }}</h4>
     </div>
+    <hr>
     <div>
         <h2>QC Logs</h2>
         <input type="text" id="logSearch" onkeyup="searchTable('logSearch', 'customerLogTable')" placeholder="Search..." title="Search logs...">
