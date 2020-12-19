@@ -75,7 +75,7 @@
         </div>
     </div>
 </div>
-<div class="center content" style="max-width: 75%; width: 100%;">
+<div class="center content" style="width: 80%;">
     <input type="text" id="productSearch" onkeyup="searchTable('productSearch', 'productTable')" placeholder="Search..." title="Search products...">
     <table id="productTable" class="bmp-table">
         <thead>
@@ -84,7 +84,7 @@
                 <th onclick="sortTable(1, 'productTable')"> Product Description </th>
                 <th onclick="sortTable(2, 'productTable')"> Customer </th>
                 <!-- <th onclick="sortTable(3, 'productTable')"> Last QC Record </th> -->
-                <th onclick="sortTable(3, 'productTable')"> Requirements </th>
+                <th onclick="sortTable(3, 'productTable')"> Last QC </th>
                 {% if current_user.is_authenticated %}
                 <th style="cursor: initial;">Edit</th>
                 <th style="cursor: initial;">Delete</th>
@@ -98,7 +98,7 @@
                 <td>{{ product.description }}</td>
                 <td>{{ product.customer }}</td>
                 <!-- <td>{{ product.lastqc }}</td> -->
-                <td><a href="products/{{ product.id }}">Click to View Requirements</a></td>
+                <td>2020-12-01 20:32:47</td>
                 {% if current_user.is_authenticated %}
                 <td><a onclick="editProduct({{ product.id }})"><img src="../static/img/edit.png"></a></td>
                 <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/img/trash.png"></a></td>

@@ -393,7 +393,7 @@ body {
   color: #4a4a4a;
   font-size: 1rem;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 2.5;
 }
 a {
   color: #3273dc;
@@ -5299,6 +5299,7 @@ a.list-item {
   min-height: 3.25rem;
   position: relative;
   z-index: 30;
+  padding-top: 10px;
 }
 .navbar.is-white {
   background-color: #fff;
@@ -5832,8 +5833,7 @@ a.list-item {
 }
 .navbar > .container {
   align-items: stretch;
-  /* display: flex; */
-  min-height: 3.25rem;
+  display: flex;
   width: 100%;
   padding-right: 15px;
   text-align: right;
@@ -5870,7 +5870,6 @@ html.has-navbar-fixed-bottom {
   align-items: stretch;
   display: flex;
   flex-shrink: 0;
-  min-height: 3.25rem;
 }
 .navbar-brand a.navbar-item:hover {
   background-color: transparent;
@@ -5998,6 +5997,10 @@ a.navbar-item:hover {
   border-color: #3273dc;
   margin-top: -0.375em;
   right: 1.125em;
+}
+.navbar-brand {
+  margin-right: auto;
+  margin-left: 10px;
 }
 .navbar-dropdown {
   font-size: 0.875rem;
