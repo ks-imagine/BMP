@@ -9,9 +9,9 @@ from routes.logs import *
 from functions import *
 
 '''
- _________________
-< Web Application >
- -----------------
+ _______________
+< Home + Profile >
+ ---------------
    \
     \
      \
@@ -38,7 +38,7 @@ def index():
 @app.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', name=current_user.name)
+    return render_template('profile.html', name=current_user.name, email=current_user.email)
 
 if __name__ == '__main__':
     app.run(debug=True)

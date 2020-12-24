@@ -60,7 +60,7 @@
         <tbody>
             <tr>
                 <td>{{ customer.id }}</td>
-                <td id="cust{{ customer.id }}"><a href="customers/{{ customer.id }}">{{ customer.customer }}</a></td>
+                <td id="cust{{ customer.id }}"><a href="{{ url_for('handle_customer', customer_id=customer.id) }}">{{ customer.customer }}</a></td>
                 {% if current_user.is_authenticated %}
                 <td>123</td>
                 <td>2020-12-01 20:32:47</td>
