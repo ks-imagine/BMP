@@ -1,6 +1,6 @@
 # BMP | Quality Control Application
 
-BMP QC Application repository. uWu
+BMP QC Application repository.
 
 
 ## Getting Started
