@@ -1,4 +1,4 @@
-from flask_login import login_required, current_user
+from flask_login import current_user
 from flask import render_template, session
 from models import *
 from config import *
@@ -34,11 +34,6 @@ def index():
     else:
         session['name'] = ''
     return render_template('index.html')
-
-@app.route('/profile')
-@login_required
-def profile():
-    return render_template('profile.html', name=current_user.name, email=current_user.email)
 
 if __name__ == '__main__':
     app.run(debug=True)
