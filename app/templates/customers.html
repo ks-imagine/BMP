@@ -51,7 +51,6 @@
                 <th onclick="sortTable(2, 'customerTable')"> # of Products </th>
                 <th onclick="sortTable(3, 'customerTable')"> Last QC </th>
                 {% if current_user.is_authenticated %}
-                <th style="cursor: initial;">Edit</th>
                 <th style="cursor: initial;">Delete</th>
                 {% endif %}
             </tr>
@@ -64,7 +63,6 @@
                 {% if current_user.is_authenticated %}
                 <td>123</td>
                 <td>2020-12-01 20:32:47</td>
-                <td><a onclick="editCustomer({{ customer.id }})"><img src="../static/img/edit.png"></a></td>
                 <td><a onclick="deleteCustomer({{ customer.id }})"><img src="../static/img/trash.png"></a></td>
                 {% endif %}
             </tr>

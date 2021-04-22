@@ -9322,6 +9322,15 @@ label.panel-block:hover {
   width: 80px;
 }
 
+#single-edit-delete {
+  font-weight: bold;
+}
+
+#single-edit-delete td {
+  border: none !important;
+  text-align: center;
+}
+
 /* Modal */
 .modal {
   display: none; /* Hidden by default */

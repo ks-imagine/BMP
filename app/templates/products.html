@@ -86,7 +86,6 @@
                 <!-- <th onclick="sortTable(3, 'productTable')"> Last QC Record </th> -->
                 <th onclick="sortTable(3, 'productTable')"> Last QC </th>
                 {% if current_user.is_authenticated %}
-                <th style="cursor: initial;">Edit</th>
                 <th style="cursor: initial;">Delete</th>
                 {% endif %}
             </tr>
@@ -100,7 +99,6 @@
                 <!-- <td>{{ product.lastqc }}</td> -->
                 <td>2020-12-01 20:32:47</td>
                 {% if current_user.is_authenticated %}
-                <td><a onclick="editProduct({{ product.id }})"><img src="../static/img/edit.png"></a></td>
                 <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/img/trash.png"></a></td>
                 {% endif %}
             </tr>

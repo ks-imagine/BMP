@@ -40,7 +40,7 @@ Kindly ensure you have the following installed:
 4. Export the required environment variables:
 
     ```
-    $ export FLASK_APP=app.py
+    $ export FLASK_APP=app/app.py
     ```
 
 5. Execute the migrations to create the database tables:

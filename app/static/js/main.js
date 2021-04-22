@@ -105,56 +105,24 @@ function deleteProduct(productID) {
   }
 }
 
-function editProduct(productID) {
-  fetch(`products/` + productID, {
-    method: "POST"
-  })
-    .then((response) => {
-      window.location.href = "/products";
-    })
-    .catch((error) => {
-      alert("Error Occured"); //MESSAGE
-      window.location.href = "/products";
-    });
-}
-
-function editCustomer(customerID) {
-  var custRow = document.getElementById('cust'+customerID);
-  var customerName = custRow.innerText;
-  custRow.innerHTML = "";
-  var input = document.createElement("input");
-  input.type = "text";
-  input.name = "customer";
-  input.className = "editCustomerInput"
-  input.value = customerName;
-  custRow.appendChild(input);
-
-  var img = document.createElement("img");
-  img.src = "http://127.0.0.1:5000/static/css/check-mark.png";
-  img.className = "invert-color";
-  img.id = "submitEditIcon";
-  custRow.appendChild(img);
-}
-
-function editCustomerSubmit(customerID, newCustomerName) {
-  var updatedCust = {"id" : customerID, "name" : newCustomerName};
-  fetch(`customers/` + customerID, {
-    method: "POST",
-    body: updatedCust
-  })
-    .then((response) => {
-      window.location.href = "/customers";
-    })
-    .catch((error) => {
-      alert("Error Occured"); //MESSAGE
-      window.location.href = "/customers";
-    });
-}
-
 function deleteCustomer(customerID) {
   var confirmed = confirm("Are you sure you want to delete this entry?");
   if (confirmed) {
     fetch(`customers/` + customerID, { method: "DELETE" })
+    .then((response) => {
+      window.location.href = "/customers";
+    })
+    .catch((error) => {
+      alert("Error Occured"); //MESSAGE
+      window.location.href = "/customers";
+    });
+  }
+}
+
+function deleteCustomerSingle(customerID) {
+  var confirmed = confirm("Are you sure you want to delete this entry?");
+  if (confirmed) {
+    fetch(customerID, { method: "DELETE" })
     .then((response) => {
       window.location.href = "/customers";
     })

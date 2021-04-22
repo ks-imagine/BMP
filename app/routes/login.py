@@ -1,5 +1,5 @@
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
-from flask import render_template, redirect, url_for, request, flash
+from flask import render_template, redirect, url_for, request, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import *
 from config import *
@@ -83,6 +83,25 @@ def logout():
 def profile():
     return render_template('profile.html', name=current_user.name, email=current_user.email)
 
+@app.route('/profile', methods=['POST'])
+@login_required
+def profile_post():
+    email = request.form.get('email')
+    name = request.form.get('name')
+
+    user = UserModel.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
+    if email != current_user.email:
+        if user: # if a user is found, we want to redirect back to signup page so user can try again
+            flash('Email address already exists')
+            return redirect(url_for('profile'))
+
+    user.email = email
+    user.name = name
+    db.session.commit()
+
+    session['name'] = current_user.name
+
+    return redirect(url_for('profile'))
 
 login_manager = LoginManager()
 login_manager.login_view = 'login'

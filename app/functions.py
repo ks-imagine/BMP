@@ -71,6 +71,37 @@ def query_customers():
         } for customer in customers]
     return results
 
+def query_customer_info(customer_id):
+    customer = CustomersModel.query.get_or_404(customer_id)
+    customer_info = {
+        "id" : customer.id,
+        "customer": customer.customer
+    }
+    return customer_info
+def query_customer_products(customer_id):
+    customer = CustomersModel.query.get_or_404(customer_id)
+    customer_name = customer.customer
+    productRecords = ProductsModel.query.filter_by(customer=customer_name)
+    productResults = [
+        {
+        "id" : product.id,
+        "bmpid": product.bmpid,
+        "description": product.description,
+        "customer": product.customer,
+        "requirements": product.requirements
+        } for product in productRecords]
+    return productResults
+def query_customer_logs(customer_id):
+    logRecords = LogsModel.query.filter_by(bmpid=12345) #Edit this.. Learn to serach by foreign key
+    logResults = [
+        {
+        "id": log.id,
+        "bmpid" : log.bmpid,
+        "lastqc" : log.lastqc,
+        "user" : log.user
+        } for log in logRecords]
+    return logResults
+
 
 ### THESE ARE DOG SHIT DELETE THEM AND BURN YOUR EYES OUT ###
 def query_requirements():

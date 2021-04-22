@@ -30,29 +30,9 @@ def handle_customers():
 
 @app.route('/customers/<customer_id>', methods=['GET', 'POST', 'DELETE'])
 def handle_customer(customer_id):
-    customer = CustomersModel.query.get_or_404(customer_id)
-    customer_name = customer.customer
-    customer_info = {
-            "id" : customer.id,
-            "customer": customer.customer
-        }
-    productRecords = ProductsModel.query.filter_by(customer=customer_name)
-    productResults = [
-        {
-        "id" : product.id,
-        "bmpid": product.bmpid,
-        "description": product.description,
-        "customer": product.customer,
-        "requirements": product.requirements
-        } for product in productRecords]
-    logRecords = LogsModel.query.filter_by(bmpid=12345) #Edit this.. Learn to serach by foreign key
-    logResults = [
-        {
-        "id": log.id,
-        "bmpid" : log.bmpid,
-        "lastqc" : log.lastqc,
-        "user" : log.user
-        } for log in logRecords]
+    customer_info = query_customer_info(customer_id)
+    productResults = query_customer_products(customer_id)
+    logResults = query_customer_logs(customer_id)
     if request.method == 'GET':
         if len(productResults) == 0:
             return render_template('customer.html', customer_info=customer_info, no_products="No Products to Display", no_logs="No QC Logs to Display")
@@ -65,8 +45,20 @@ def handle_customer(customer_id):
         # This will update the customer name in the customers table.
         # Only works if customer name doesn't exist.
         # Update entries in product and qc tables.
-        flash("OK")
-        return{"POST": "POST THINGY"}
+        customer = CustomersModel.query.get_or_404(customer_id)
+        new_customer_name = request.form.get('customer')
+        if new_customer_name != customer.customer:
+            customer.customer = new_customer_name
+            db.session.commit()
+        customer_info = query_customer_info(customer_id)
+        productResults = query_customer_products(customer_id)
+        logResults = query_customer_logs(customer_id)
+        if len(productResults) == 0:
+            return render_template('customer.html', customer_info=customer_info, no_products="No Products to Display", no_logs="No QC Logs to Display")
+        elif len(logResults) == 0:
+            return render_template('customer.html', customer_info=customer_info, productResults=productResults, no_logs="No QC Logs to Display")
+        else:
+            return render_template('customer.html', customer_info=customer_info, productResults=productResults, logResults=logResults)
 
     elif request.method == 'DELETE':
         productRecord = ProductsModel.query.filter_by(customer=customer_name).first()
