@@ -1,0 +1,144 @@
+<!-- templates/products.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title bmp-title">
+    All Products
+</h1>
+<label id="add-product-button" class="modal-buttons">Add Product +</label>
+<h3 class="status good">{{ status_good }}</h3>
+<h3 class="status bad">{{ status_bad }}</h3>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <h3 class="status fail">
+        {{ message }}
+    </h3>
+    {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div id="product-modal" class="modal">
+    <div class="center content modal-content" id="product-modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2>Add a Product</h2>
+        </div>
+        <div class="modal-body">
+            <form method="POST">
+                <p>
+                    <label for="bmpid">BMP Product Number &nbsp;&nbsp;&nbsp;</label>
+                    <input type="number" id="bmpid" name="bmpid" value="12345">
+                </p>
+                <p>
+                    <label for="description">Product Description</label>
+                    <input type="text" id="description" name="description" value="Some Product">
+                </p>
+                <p>
+                    <label for="customer">Customer</label>
+                    <select id="customer" name="customer">
+                        {% for customer in customerResults %}
+                        <option value="{{ customer.customer }}">{{ customer.customer }}</option>
+                        {% endfor %}
+                    </select>
+                </p>
+                <p>
+                    <label for="requirements">Requirements</label>
+                    <input type="text" id="requirements" name="requirements" style="display:none;">
+                    <span id="requirements-final" style="display:none;"></span>
+                    <span id="req-button" class="modal-buttons build-req" onclick="launchReqBuilder()">Build Requirements</span>
+                </p>
+                <div>
+                    <input type="submit" value="Submit" class="modal-buttons bmp-submit">
+                </div>
+            </form>
+            <!-- Req Table -->
+            <div id="req-table" style="display:none;">
+                <hr style="height:3px;">
+                <input type="button" id="addRow" value="Add New Row" class="modal-buttons" onclick="addRow()" />
+                <div id="cont">
+                    <table id="empTable">
+                        <tr>
+                            <th></th>
+                            <th>Requirements (Short)</th>
+                            <th>Requirements (Long)</th>
+                            <th>Value Type</th>
+                            <th>Max</th>
+                            <th>Min</th>
+                        </tr>
+                    </table>
+                </div>
+                <input type="button" id="bt" value="Submit Requirements" class="modal-buttons" onclick="submit()" style="margin-top: 10px;"/>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="center content" style="width: 80%;">
+    <input type="text" id="productSearch" onkeyup="searchTable('productSearch', 'productTable')" placeholder="Search..." title="Search products...">
+    <table id="productTable" class="bmp-table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0, 'productTable')"> BMP ID# </th>
+                <th onclick="sortTable(1, 'productTable')"> Product Description </th>
+                <th onclick="sortTable(2, 'productTable')"> Customer </th>
+                <!-- <th onclick="sortTable(3, 'productTable')"> Last QC Record </th> -->
+                <th onclick="sortTable(3, 'productTable')"> Last QC </th>
+                {% if current_user.is_authenticated %}
+                <th style="cursor: initial;">Edit</th>
+                <th style="cursor: initial;">Delete</th>
+                {% endif %}
+            </tr>
+        </thead>
+        {% for product in results %}
+        <tbody>
+            <tr>
+                <td>{{ product.bmpid }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ product.customer }}</td>
+                <!-- <td>{{ product.lastqc }}</td> -->
+                <td>2020-12-01 20:32:47</td>
+                {% if current_user.is_authenticated %}
+                <td><a onclick="editProduct({{ product.id }})"><img src="../static/img/edit.png"></a></td>
+                <td><a onclick="deleteProduct({{ product.id }})"><img src="../static/img/trash.png"></a></td>
+                {% endif %}
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+    <h4>{{ no_products }}</h4>
+</div>
+<script>
+    window.onload = function() {
+        var productModal = document.getElementById("product-modal");
+        var productAddButton = document.getElementById("add-product-button");
+        var close1 = document.getElementsByClassName("close")[0];
+        var reqTable = document.getElementById("req-table");
+        var modalContent = document.getElementById("product-modal-content");
+
+        // When the user clicks the button, open the modal
+        productAddButton.onclick = function () {
+            productModal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        close1.onclick = function () {
+            productModal.style.display = "none";
+            reqTable.style.display = "none";
+            modalContent.style.top = "initial";
+            modalContent.style.bottom = "50%";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == productModal) {
+                productModal.style.display = "none";
+                reqTable.style.display = "none";
+                modalContent.style.top = "initial";
+                modalContent.style.bottom = "50%";
+            }
+        }
+    };
+</script>
+{% endblock %}

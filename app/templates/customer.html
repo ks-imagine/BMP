@@ -1,0 +1,67 @@
+<!-- templates/customer.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title bmp-title">
+    {{ customer_info.customer }}
+</h1>
+<div class="center content" style="max-width: 75%; width: 100%;">
+    <hr>
+    <div>
+        <h2>Products</h2>
+        <input type="text" id="productSearch" onkeyup="searchTable('productSearch', 'customerProductTable')" placeholder="Search..." title="Search products...">
+        <table id="customerProductTable" class="bmp-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'customerProductTable')">BMP ID#</th>
+                    <th onclick="sortTable(1, 'customerProductTable')">Product Description</th>
+                    <th onclick="sortTable(3, 'customerProductTable')">Last QC Record</th>
+                    <th onclick="sortTable(4, 'customerProductTable')">Requirements</th>
+                </tr>
+            </thead>
+            {% for product in productResults %}
+            <tbody>
+                <tr>
+                    <td>{{ product.bmpid }}</td>
+                    <td>{{ product.description }}</td>
+                    <!-- <td>{{ product.lastqc }}</td> -->
+                    <td>12/12/2020</td>
+                    <td><a href="../products/{{ product.id }}">View Requirements</a></td>
+                </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+        <h4 class="status bad">{{ no_products }}</h4>
+    </div>
+    <hr>
+    <div>
+        <h2>QC Logs</h2>
+        <input type="text" id="logSearch" onkeyup="searchTable('logSearch', 'customerLogTable')" placeholder="Search..." title="Search logs...">
+        <table id="customerLogTable" class="bmp-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'customerLogTable')">Log ID#</th>
+                    <th onclick="sortTable(1, 'customerLogTable')">BMP ID#</th>
+                    <th onclick="sortTable(2, 'customerLogTable')">Date / Time(PT)</th>
+                    <th onclick="sortTable(3, 'customerLogTable')">User</th>
+                    <th>QC Results</th>
+                </tr>
+            </thead>
+            {% for log in logResults %}
+            <tbody>
+                <tr>
+                    <td>{{ log.id }}</td>
+                    <td>{{ log.bmpid }}</td>
+                    <td>{{ log.lastqc }}</td>
+                    <td>{{ log.user }}</td>
+                    <td><a href="../logs/{{ log.id }}">View QC Results</a></td>
+                </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+        <h4 class="status bad">{{ no_logs }}</h4>
+    </div>
+</div>
+
+{% endblock %}
