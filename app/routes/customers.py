@@ -30,6 +30,7 @@ def handle_customers():
 
 @app.route('/customers/<customer_id>', methods=['GET', 'POST', 'DELETE'])
 def handle_customer(customer_id):
+    customer = CustomersModel.query.get_or_404(customer_id)
     customer_info = query_customer_info(customer_id)
     productResults = query_customer_products(customer_id)
     logResults = query_customer_logs(customer_id)
@@ -42,10 +43,6 @@ def handle_customer(customer_id):
             return render_template('customer.html', customer_info=customer_info, productResults=productResults, logResults=logResults)
 
     elif request.method == 'POST':
-        # This will update the customer name in the customers table.
-        # Only works if customer name doesn't exist.
-        # Update entries in product and qc tables.
-        customer = CustomersModel.query.get_or_404(customer_id)
         new_customer_name = request.form.get('customer')
         if new_customer_name != customer.customer:
             customer.customer = new_customer_name
@@ -61,6 +58,7 @@ def handle_customer(customer_id):
             return render_template('customer.html', customer_info=customer_info, productResults=productResults, logResults=logResults)
 
     elif request.method == 'DELETE':
+        customer_name = customer.customer
         productRecord = ProductsModel.query.filter_by(customer=customer_name).first()
         if (productRecord == None):
             db.session.delete(customer)
