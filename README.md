@@ -19,7 +19,6 @@ Kindly ensure you have the following installed:
 
     ```
     $ git clone https://github.com/ks-imagine/BMP.git
-    $ cd app
     ```
 
 2. With Python 3.6 and Pip installed:
@@ -28,6 +27,8 @@ Kindly ensure you have the following installed:
     $ virtualenv --python=python3 env --no-site-packages
     $ source env/bin/activate
     $ pip install -r requirements.txt
+    $ brew install postgresql
+    $ cd app
     ```
 
 3. Create a PostgreSQL user with the username and password `postgres` and create a database called `bmp-qc`:
