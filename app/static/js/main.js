@@ -240,7 +240,7 @@ function submit() {
   if (arrValues.length > 0) {
     reqInput.value = finalRequirements;
 
-    reqFinal.innerHTML = finalRequirements;
+    reqFinal.innerHTML = formatReqs(finalRequirements);
     reqFinal.style.display = "block";
     reqButton.innerHTML = "Edit Requirements";
     launchReqBuilder();
@@ -252,6 +252,21 @@ function submit() {
     reqButton.innerHTML = "Build Requirements";
     launchReqBuilder();
   }
+}
+
+function formatReqs(jsonString) {
+  var formattedReqs = '';
+  var keyCount = 0;
+  var keyArray = ["Short Requirement", "Long Requirement", "Type", "Pass", "Fail"]
+  for (var i = 0; i < jsonString.length; i++) {
+    if (keyCount > 4) {
+      keyCount = 0;
+      formattedReqs += "<br/>";
+    }
+    formattedReqs += keyArray[keyCount] + " : " + jsonString[i] + "<br/>";
+    keyCount++;
+  }
+  return formattedReqs;
 }
 
 function checkValues(string) {
